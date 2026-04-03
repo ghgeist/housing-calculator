@@ -18,6 +18,7 @@ type TooltipPayloadEntry = NonNullable<TooltipProps<number, string>["payload"]>[
 
 interface ComparisonChartProps {
   data: YearlyComparison[];
+  investMonthlySavings: boolean;
 }
 
 function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
@@ -36,7 +37,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
   );
 }
 
-export function ComparisonChart({ data }: ComparisonChartProps) {
+export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartProps) {
   const isCompact = useIsMobile();
   const chartMargin = isCompact
     ? { top: 8, right: 8, left: 4, bottom: 16 }
@@ -44,9 +45,10 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
   const yAxisWidth = isCompact ? 56 : 60;
   const legendFontSize = isCompact ? 11 : 12;
   const ownerNetName = isCompact ? "Own (net)" : "Own: net cost";
-  const renterNetName = isCompact ? "Rent + invest" : "Rent + invest: net cost";
+  const renterNetName = isCompact ? "Rent path" : investMonthlySavings ? "Rent + invest: net cost" : "Rent path: net cost";
   const homeEquityName = isCompact ? "Home equity" : "Home equity (net)";
   const renterPortfolioName = isCompact ? "Renter fund" : "Renter portfolio";
+  const comparisonTitle = investMonthlySavings ? "Owning vs renting + investing" : "Owning vs renting";
 
   const chartData = data.map((d) => ({
     year: d.year,
@@ -71,9 +73,14 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
   return (
     <div className="comparison-chart">
       <div className="chart-header">
-        <h3 className="section-title">Owning vs renting + investing</h3>
+        <h3 className="section-title">{comparisonTitle}</h3>
         <p className="chart-subtitle">
           Cumulative net cost of each path over the years you entered. Lower is cheaper.
+        </p>
+        <p className="chart-subtitle">
+          {investMonthlySavings
+            ? "Renter path includes the invested down payment and any positive monthly savings."
+            : "Renter path includes the invested down payment only; monthly savings are not auto-invested."}
         </p>
       </div>
 
@@ -81,13 +88,13 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
         <div className="chart-summary">
           {ownerWins ? (
             <span className="chart-summary-win">
-              In this run, owning is about{" "}
+              In this scenario, owning is about{" "}
               {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
               {data.length} years
             </span>
           ) : (
             <span className="chart-summary-lose">
-              In this run, renting + investing is about{" "}
+              In this scenario, {investMonthlySavings ? "renting + investing" : "renting"} is about{" "}
               {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
               {data.length} years
             </span>
@@ -158,7 +165,9 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
       <div className="chart-wealth-section">
         <h4 className="chart-wealth-title">Where the money ends up</h4>
         <p className="chart-subtitle">
-          Home equity versus what the renter&apos;s investments grew to. Paper wealth, not cash in hand.
+          {investMonthlySavings
+            ? "Home equity versus what the renter's investments grew to. Balance-sheet value, not cash in hand."
+            : "Home equity versus the renter's invested upfront capital. Balance-sheet value, not cash in hand."}
         </p>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={chartData} margin={chartMargin}>

@@ -86,6 +86,7 @@ export function calcMonthlyBreakdown(inputs: HousingInputs): MonthlyBreakdown {
     propertyTaxRate,
     maintenanceRate,
     annualInsurance,
+    monthlyHoa,
   } = inputs;
 
   const { loanAmount } = getLoanSnapshot(homePrice, downPaymentPct);
@@ -98,9 +99,11 @@ export function calcMonthlyBreakdown(inputs: HousingInputs): MonthlyBreakdown {
   const propertyTax = homePrice * toRate(propertyTaxRate) / MONTHS_PER_YEAR;
   const maintenance = homePrice * toRate(maintenanceRate) / MONTHS_PER_YEAR;
   const insurance = annualInsurance / MONTHS_PER_YEAR;
+  const hoa = monthlyHoa;
 
   // True ownership cost tracks consumed monthly spend, not equity conversion.
-  const trueOwnershipCost = interest + propertyTax + maintenance + insurance;
+  const trueOwnershipCost = interest + propertyTax + maintenance + insurance + hoa;
+  const totalOwnerCashOutflow = principalAndInterest + propertyTax + maintenance + insurance + hoa;
 
   return {
     principalAndInterest,
@@ -109,7 +112,9 @@ export function calcMonthlyBreakdown(inputs: HousingInputs): MonthlyBreakdown {
     propertyTax,
     maintenance,
     insurance,
+    hoa,
     trueOwnershipCost,
+    totalOwnerCashOutflow,
   };
 }
 
@@ -131,6 +136,7 @@ export function calcCarryAnalysis(inputs: HousingInputs): CarryAnalysis {
     propertyTaxRate,
     maintenanceRate,
     annualInsurance,
+    monthlyHoa,
     monthlyRent,
   } = inputs;
 
@@ -138,11 +144,13 @@ export function calcCarryAnalysis(inputs: HousingInputs): CarryAnalysis {
 
   const imputedRentYield = homePrice === 0 ? 0 : (monthlyRent * MONTHS_PER_YEAR) / homePrice;
   const insuranceRate = homePrice === 0 ? 0 : annualInsurance / homePrice;
+  const hoaRate = homePrice === 0 ? 0 : (monthlyHoa * MONTHS_PER_YEAR) / homePrice;
   const carryDrag =
     toRate(mortgageRate) * ltv +
     toRate(propertyTaxRate) +
     toRate(maintenanceRate) +
-    insuranceRate;
+    insuranceRate +
+    hoaRate;
 
   const delta = imputedRentYield - carryDrag;
 
@@ -163,12 +171,14 @@ export function calcYearlyComparison(inputs: HousingInputs): YearlyComparison[] 
     propertyTaxRate,
     maintenanceRate,
     annualInsurance,
+    monthlyHoa,
     propertyCostBasis,
     monthlyRent,
     rentGrowthRate,
     appreciationRate,
     sellingCostPct,
     investmentReturnRate,
+    investMonthlySavings,
     holdingPeriod,
   } = inputs;
 
@@ -184,7 +194,8 @@ export function calcYearlyComparison(inputs: HousingInputs): YearlyComparison[] 
       annualPrincipalAndInterest +
       propertyCostBase * toRate(propertyTaxRate) +
       propertyCostBase * toRate(maintenanceRate) +
-      annualInsurance
+      annualInsurance +
+      monthlyHoa * MONTHS_PER_YEAR
     );
   });
 
@@ -202,9 +213,9 @@ export function calcYearlyComparison(inputs: HousingInputs): YearlyComparison[] 
     const sellingCosts = homeValue * toRate(sellingCostPct);
     const saleProceedsNet = homeValue - sellingCosts - remainingBalance;
 
-    const cumulativeOwnerCashflow =
+    const cumulativeOwnerCashIn =
       downPayment + annualOwnershipCashOutflows.slice(0, year).reduce((sum, yearlyCost) => sum + yearlyCost, 0);
-    const ownerNetCost = cumulativeOwnerCashflow - saleProceedsNet;
+    const ownerNetCost = cumulativeOwnerCashIn - saleProceedsNet;
 
     let cumulativeRentPaid = 0;
     let renterPortfolio = downPayment;
@@ -214,7 +225,7 @@ export function calcYearlyComparison(inputs: HousingInputs): YearlyComparison[] 
       cumulativeRentPaid += annualRent;
 
       const annualSavingsFromRenting = annualOwnershipCashOutflows[currentYear - 1] - annualRent;
-      if (annualSavingsFromRenting > 0) {
+      if (investMonthlySavings && annualSavingsFromRenting > 0) {
         renterPortfolio += annualSavingsFromRenting;
       }
 
@@ -232,6 +243,7 @@ export function calcYearlyComparison(inputs: HousingInputs): YearlyComparison[] 
       netEquity: homeValue - remainingBalance - sellingCosts,
       renterPortfolio,
       cumulativeRentPaid,
+      cumulativeOwnerCashIn,
     });
   }
 

@@ -1,5 +1,9 @@
 import { expect, test } from "vitest";
-import { commitNumberFromDraft, committedNumberDisplay } from "./numberInputCommit";
+import {
+  commitNumberFromDraft,
+  committedNumberDisplay,
+  committedNumberDisplayDollars,
+} from "./numberInputCommit";
 
 test("commitNumberFromDraft keeps committed on empty or invalid draft", () => {
   expect(commitNumberFromDraft("", 750000, 0)).toBe(750000);
@@ -11,6 +15,8 @@ test("commitNumberFromDraft keeps committed on empty or invalid draft", () => {
 
 test("commitNumberFromDraft parses and clamps to min", () => {
   expect(commitNumberFromDraft("400000", 750000, 0)).toBe(400000);
+  expect(commitNumberFromDraft("400,000", 750000, 0)).toBe(400000);
+  expect(commitNumberFromDraft("  1,234,567  ", 0, 0)).toBe(1_234_567);
   expect(commitNumberFromDraft("3", 30, 5)).toBe(5);
   expect(commitNumberFromDraft("-10", 100, 0)).toBe(0);
 });
@@ -24,4 +30,10 @@ test("commitNumberFromDraft applies transform", () => {
 test("committedNumberDisplay stringifies numbers", () => {
   expect(committedNumberDisplay(750000)).toBe("750000");
   expect(committedNumberDisplay(6.75)).toBe("6.75");
+});
+
+test("committedNumberDisplayDollars uses grouping", () => {
+  expect(committedNumberDisplayDollars(400_000)).toBe("400,000");
+  expect(committedNumberDisplayDollars(750000)).toBe("750,000");
+  expect(committedNumberDisplayDollars(0)).toBe("0");
 });

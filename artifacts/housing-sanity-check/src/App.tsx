@@ -32,10 +32,10 @@ function App() {
     <div className="app-container">
       <header className="app-header">
         <div className="header-inner">
-          <h1 className="app-title">Housing Sanity Check</h1>
+          <h1 className="app-title">Housing Calculator</h1>
           <p className="app-subtitle">
-            Plug in a few numbers and compare the monthly cash cost of owning with renting a comparable place. You type
-            the rent you think matches this home; it is your estimate, not a market scrape.
+            Start with the form below: home price, down payment, and rent for a truly comparable place. Outputs are only
+            as good as your rent, tax, insurance, HOA, and appreciation assumptions.
           </p>
           <a className="jump-to-results" href="#results">
             Jump to results
@@ -46,43 +46,67 @@ function App() {
       <main className="app-main">
         <div className="layout-grid">
           <aside className="layout-inputs">
-            <InputsPanel inputs={inputs} onChange={setInputs} />
+            <InputsPanel
+              inputs={inputs}
+              impliedRentYield={results.carry.imputedRentYield}
+              onChange={setInputs}
+            />
           </aside>
 
           <div className="layout-results">
             <ResultsPanel results={results} inputs={inputs} />
             <Suspense fallback={<ChartSectionFallback />}>
-              <ComparisonChart data={results.yearlyComparison} />
+              <ComparisonChart data={results.yearlyComparison} investMonthlySavings={inputs.investMonthlySavings} />
             </Suspense>
 
             <div className="framing-note">
               <h3 className="framing-title">What you&apos;re looking at</h3>
-              <p>
-                <strong>Monthly reality</strong>: interest, taxes, upkeep, and insurance versus the monthly rent you
-                assign for a comparable place (your estimate from the form). A home is something you live in and pay
-                for; this is not a pitch that owning always beats the market.
+              <p className="framing-lead">
+                This tool separates what you pay to live in a home from what builds equity. It is meant to make the{" "}
+                <strong>structure</strong> of housing decisions clearer, not to predict the future.
               </p>
+              <p className="framing-guardrail">
+                Income tax is not modeled (for example, mortgage interest deductions). Most households take the
+                standard deduction.
+              </p>
+              <ul className="framing-bullets">
+                <li>
+                  <strong>Monthly reality</strong> compares what it really costs to live in the home (interest, taxes,
+                  upkeep, insurance, HOA) to the comparable rent you enter.
+                </li>
+                <li>
+                  <strong>Principal</strong> pays down the loan and builds equity—it isn’t counted in{" "}
+                  <strong>true monthly cost</strong>, which is about living costs, not building ownership.
+                </li>
+                <li>
+                  <strong>Results</strong> depend heavily on your rent assumption and the other inputs you choose.
+                </li>
+              </ul>
               <details className="framing-methodology">
                 <summary className="framing-methodology-summary">
                   More on carry, the chart, and true monthly cost
                 </summary>
                 <p>
-                  <strong>True monthly cost</strong> leaves out principal paydown because that turns cash into equity, not
-                  day-to-day spending. The chart compares two straight stories: you own, or you rent and invest the
-                  difference. Neither path is automatically right. The point is to make the tradeoff visible.
+                  <strong>True monthly cost</strong> leaves out principal because that turns cash into home equity—not
+                  part of what you spend to live there month to month. The chart compares two straight stories: you own,
+                  or you rent and{" "}
+                  {inputs.investMonthlySavings
+                    ? "invest the upfront cash plus any positive monthly savings."
+                    : "invest the upfront cash only, without auto-investing monthly savings."}{" "}
+                  Neither path is automatically right. The point is to make the tradeoff visible.
                 </p>
-                <ul>
+                <ul className="framing-methodology-bullets">
                   <li>
-                    <strong>Positive Carry</strong>: implied rent from your numbers is high enough that total financing
-                    and ownership drag stays modest (see the carry snapshot). Owning is roughly efficient on cash flow.
+                    <strong>Positive Carry</strong>: rent as a share of home price is above modeled mortgage and
+                    ownership costs. That’s a favorable comparison on this lens—not a promise about your personal cash
+                    flow.
                   </li>
                   <li>
-                    <strong>Near Neutral</strong>: roughly in balance. You pay a modest premium to own.
+                    <strong>Near Neutral</strong>: those two ideas are close to even on this view.
                   </li>
                   <li>
-                    <strong>Negative Carry</strong>: owning costs more each month than that implied rent. You pay a real
-                    premium to own; that can still be worth it for stability or other reasons, and you can see how much
-                    in the results.
+                    <strong>Negative Carry</strong>: rent as a share of home price is below modeled ownership costs—an
+                    ownership premium on this comparison, not the same as negative cash flow in daily life.
                   </li>
                 </ul>
               </details>

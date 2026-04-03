@@ -18,6 +18,8 @@ test("renders positive carry badge and cheaper-to-own copy", () => {
   expect(html).toMatch(/badge-positive/);
   expect(html).toMatch(/cheaper to own than rent/);
   expect(html).toMatch(/hero-positive/);
+  expect(html).toMatch(/Total owner cash outflow/);
+  expect(html).toMatch(/Money back at exit/);
 });
 
 test("renders negative carry badge and more-expensive-to-own copy", () => {
@@ -33,4 +35,6 @@ test("renders negative carry badge and more-expensive-to-own copy", () => {
   expect(html).toMatch(/badge-negative/);
   expect(html).toMatch(/more expensive to own than rent/);
   expect(html).toMatch(/hero-negative/);
+  expect(html).toMatch(/ownership premium/);
+  expect(html).toMatch(/Estimated net sale proceeds/);
 });
