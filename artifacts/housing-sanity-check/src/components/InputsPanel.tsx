@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { HousingInputs } from "@/lib/types";
+import type { HousingInputs, PropertyCostBasis } from "@/types/housing";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
 import { formatCurrency } from "@/lib/format";
 
@@ -78,6 +78,10 @@ function NumberInput({
 export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
   function update(key: keyof HousingInputs, value: number) {
     onChange({ ...inputs, [key]: value });
+  }
+
+  function updatePropertyCostBasis(value: PropertyCostBasis) {
+    onChange({ ...inputs, propertyCostBasis: value });
   }
 
   function applyPreset(presetIdx: number) {
@@ -198,6 +202,20 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
             step={100}
             min={0}
           />
+        </Field>
+
+        <Field
+          label="Tax & maintenance base"
+          tooltip="Choose whether property tax and maintenance are modeled from the original purchase price or from the home's current appreciated value each year."
+        >
+          <select
+            className="number-input"
+            value={inputs.propertyCostBasis}
+            onChange={(e) => updatePropertyCostBasis(e.target.value as PropertyCostBasis)}
+          >
+            <option value="purchase">Purchase price (default)</option>
+            <option value="currentValue">Current home value</option>
+          </select>
         </Field>
       </div>
 

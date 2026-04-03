@@ -1,5 +1,5 @@
-import type { ModelResults, HousingInputs } from "@/lib/types";
-import { formatCurrency, formatPercent } from "@/lib/format";
+import type { ModelResults, HousingInputs } from "../types/housing.js";
+import { formatCurrency, formatPercent } from "../lib/format.js";
 
 interface ResultsPanelProps {
   results: ModelResults;
