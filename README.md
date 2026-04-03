@@ -61,12 +61,24 @@ Build:
 PORT=5173 BASE_PATH=/ pnpm --filter @workspace/housing-sanity-check run build
 ```
 
-## Tests
+## Tests and lint
 
-Run tests:
+From repo root (runs Vitest for the whole workspace):
+
+```bash
+pnpm test:run
+```
+
+Housing app tests only:
 
 ```bash
 pnpm --filter @workspace/housing-sanity-check run test
+```
+
+Lint:
+
+```bash
+pnpm lint
 ```
 
 Typecheck app package:

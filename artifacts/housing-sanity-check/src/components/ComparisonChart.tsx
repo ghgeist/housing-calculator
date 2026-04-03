@@ -28,7 +28,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
         <div key={entry.dataKey} className="chart-tooltip-row">
           <span className="chart-tooltip-color" style={{ background: entry.color }} />
           <span className="chart-tooltip-name">{entry.name}:</span>
-          <span className="chart-tooltip-value">{formatCurrency(entry.value, true)}</span>
+          <span className="chart-tooltip-value">{formatCurrency(entry.value ?? 0, true)}</span>
         </div>
       ))}
     </div>

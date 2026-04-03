@@ -21,7 +21,8 @@ module.exports = {
   ],
   settings: {
     react: {
-      version: "18.3.1",
+      // Align with pnpm-workspace.yaml catalog (react / react-dom)
+      version: "19.1.0",
     },
   },
   rules: {

@@ -1,5 +1,4 @@
-import { test } from "vitest";
-import assert from "node:assert/strict";
+import { expect, test } from "vitest";
 import { DEFAULT_INPUTS } from "../defaults";
 import {
   calcCarryAnalysis,
@@ -12,31 +11,31 @@ import {
 
 test("calculates monthly mortgage payment", () => {
   const payment = calcMonthlyPayment(400_000, 0.06, 30);
-  assert.ok(Math.abs(payment - 2398.2021) < 1e-4);
+  expect(Math.abs(payment - 2398.2021)).toBeLessThan(1e-4);
 });
 
 test("handles zero-interest mortgage payments", () => {
   const payment = calcMonthlyPayment(360_000, 0, 30);
-  assert.equal(payment, 1000);
+  expect(payment).toBe(1000);
 });
 
 test("calculates remaining balance after amortization period", () => {
   const balance = calcRemainingBalance(400_000, 0.06, 30, 5);
-  assert.ok(Math.abs(balance - 372_217.4273) < 1e-3);
+  expect(Math.abs(balance - 372_217.4273)).toBeLessThan(1e-3);
 });
 
 test("reduces to straight-line principal at zero rate", () => {
   const balance = calcRemainingBalance(360_000, 0, 30, 10);
-  assert.ok(Math.abs(balance - 240_000) < 1e-8);
+  expect(Math.abs(balance - 240_000)).toBeLessThan(1e-8);
 });
 
 test("computes true monthly ownership cost excluding principal paydown", () => {
   const monthly = calcMonthlyBreakdown(DEFAULT_INPUTS);
 
   const expected = monthly.interest + monthly.propertyTax + monthly.maintenance + monthly.insurance;
-  assert.ok(Math.abs(monthly.trueOwnershipCost - expected) < 1e-8);
+  expect(Math.abs(monthly.trueOwnershipCost - expected)).toBeLessThan(1e-8);
   const nonMortgageCosts = monthly.propertyTax + monthly.maintenance + monthly.insurance;
-  assert.ok(Math.abs((monthly.trueOwnershipCost + monthly.principal) - (monthly.principalAndInterest + nonMortgageCosts)) < 1e-8);
+  expect(Math.abs(monthly.trueOwnershipCost + monthly.principal - (monthly.principalAndInterest + nonMortgageCosts))).toBeLessThan(1e-8);
 });
 
 test("classifies carry using documented thresholds", () => {
@@ -50,7 +49,7 @@ test("classifies carry using documented thresholds", () => {
     annualInsurance: 0,
     monthlyRent: 0,
   });
-  assert.equal(nearNeutral.status, "Near Neutral");
+  expect(nearNeutral.status).toBe("Near Neutral");
 
   const positiveCarry = calcCarryAnalysis({
     ...DEFAULT_INPUTS,
@@ -62,7 +61,7 @@ test("classifies carry using documented thresholds", () => {
     annualInsurance: 0,
     monthlyRent: 1,
   });
-  assert.equal(positiveCarry.status, "Positive Carry");
+  expect(positiveCarry.status).toBe("Positive Carry");
 
   const negativeCarry = calcCarryAnalysis({
     ...DEFAULT_INPUTS,
@@ -74,7 +73,7 @@ test("classifies carry using documented thresholds", () => {
     annualInsurance: 0,
     monthlyRent: 0,
   });
-  assert.equal(negativeCarry.status, "Negative Carry");
+  expect(negativeCarry.status).toBe("Negative Carry");
 });
 
 test("propertyCostBasis=currentValue increases owner cost under appreciation", () => {
@@ -98,18 +97,19 @@ test("propertyCostBasis=currentValue increases owner cost under appreciation", (
 
   const purchaseFinal = purchaseBasis.at(-1);
   const currentValueFinal = currentValueBasis.at(-1);
-  assert.ok(purchaseFinal && currentValueFinal);
-  assert.ok(currentValueFinal.ownerNetCost > purchaseFinal.ownerNetCost);
+  expect(purchaseFinal).toBeDefined();
+  expect(currentValueFinal).toBeDefined();
+  expect(currentValueFinal!.ownerNetCost).toBeGreaterThan(purchaseFinal!.ownerNetCost);
 });
 
 test("returns coherent yearly comparison outputs", () => {
   const result = runModel(DEFAULT_INPUTS);
 
-  assert.equal(result.yearlyComparison.length, DEFAULT_INPUTS.holdingPeriod);
-  assert.equal(result.yearlyComparison[0].year, 1);
+  expect(result.yearlyComparison.length).toBe(DEFAULT_INPUTS.holdingPeriod);
+  expect(result.yearlyComparison[0].year).toBe(1);
 
   const final = result.yearlyComparison.at(-1);
-  assert.ok(final);
-  assert.ok(final!.homeValue > DEFAULT_INPUTS.homePrice);
-  assert.ok(final!.remainingBalance < result.loanAmount);
+  expect(final).toBeDefined();
+  expect(final!.homeValue).toBeGreaterThan(DEFAULT_INPUTS.homePrice);
+  expect(final!.remainingBalance).toBeLessThan(result.loanAmount);
 });
