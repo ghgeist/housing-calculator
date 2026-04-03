@@ -137,7 +137,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <StatCard
           label="True monthly cost"
           value={formatCurrency(monthly.trueOwnershipCost)}
-          sub="Interest, taxes, upkeep, insurance, HOA"
+          sub="Uses 1st-payment mortgage interest, plus taxes, upkeep, insurance, HOA"
         />
         <StatCard
           label="Comparable rent"
@@ -164,7 +164,10 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
       <CollapsibleResultSection sectionId="monthly-breakdown" defaultOpen title="Monthly breakdown">
         <div className="detail-list">
           <h4 className="breakdown-subheading">Living costs</h4>
-          <DetailRow label="Mortgage interest" value={formatCurrency(monthly.interest)} />
+          <DetailRow
+            label="Mortgage interest (1st payment)"
+            value={formatCurrency(monthly.interest)}
+          />
           <DetailRow label="Property taxes" value={formatCurrency(monthly.propertyTax)} />
           <DetailRow label="Maintenance (budgeted)" value={formatCurrency(monthly.maintenance)} />
           <DetailRow label="Insurance" value={formatCurrency(monthly.insurance)} />
@@ -174,20 +177,29 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
             value={formatCurrency(monthly.trueOwnershipCost)}
           />
 
-          <h4 className="breakdown-subheading">Equity (not a cost)</h4>
+          <h4 className="breakdown-subheading">Mortgage payment split (changes every month)</h4>
           <p className="breakdown-hint">
-            Principal paydown isn’t its own field: it’s implied by the standard payment from home price, down payment,
-            mortgage rate, and term under <strong>Your numbers</strong>. The split shown is for the{" "}
-            <strong>first month</strong> on the starting loan balance (principal grows each month after that).
+            P&amp;I is level each month, but the <strong>interest vs. principal parts</strong> shift as the balance
+            falls. These rows are not separate “living costs”—they explain how the fixed mortgage payment breaks down.
           </p>
           <DetailRow
-            label="Principal paydown (builds equity, not a cost)"
+            label="Mortgage payment (P&amp;I, fixed each month)"
+            value={formatCurrency(monthly.principalAndInterest)}
+            muted
+          />
+          <DetailRow
+            label="Principal portion, 1st payment (equity, not a living cost)"
             value={formatCurrency(monthly.principal)}
             muted
           />
           <DetailRow
-            label="Mortgage payment (principal + interest)"
-            value={formatCurrency(monthly.principalAndInterest)}
+            label="Interest portion, year-1 monthly average"
+            value={formatCurrency(monthly.interestYearOneMonthlyAvg)}
+            muted
+          />
+          <DetailRow
+            label="Principal portion, year-1 monthly average"
+            value={formatCurrency(monthly.principalYearOneMonthlyAvg)}
             muted
           />
 
@@ -195,10 +207,10 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           <DetailRow label="Total owner cash outflow" value={formatCurrency(monthly.totalOwnerCashOutflow)} />
         </div>
         <p className="detail-note">
-          Living costs are what you pay to occupy the home. Principal turns cash into home equity—it’s not a cost of
-          living in the home. Paying down principal is similar to earning your mortgage rate on that money, but it
-          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month,
-          including the full mortgage payment.
+          True monthly cost is consumed spend only: it uses <strong>first-payment</strong> interest so the headline
+          stays a single, consistent snapshot (actual interest falls each month). Principal is cash moved into
+          equity—not rent-like consumption—and the year-1 average shows typical principal paydown is higher than on
+          payment one. Total owner cash outflow still counts the full mortgage payment every month.
         </p>
       </CollapsibleResultSection>
 

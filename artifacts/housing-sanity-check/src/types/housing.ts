@@ -21,8 +21,14 @@ export interface HousingInputs {
 
 export interface MonthlyBreakdown {
   principalAndInterest: number;
+  /** Interest portion of P&I on the first payment (matches true monthly cost). */
   interest: number;
+  /** Principal portion of P&I on the first payment. */
   principal: number;
+  /** Average interest portion over months 1–12 (P&I is constant; interest share falls over time). */
+  interestYearOneMonthlyAvg: number;
+  /** Average principal portion over months 1–12. */
+  principalYearOneMonthlyAvg: number;
   propertyTax: number;
   maintenance: number;
   insurance: number;

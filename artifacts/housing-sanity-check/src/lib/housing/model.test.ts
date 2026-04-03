@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import { DEFAULT_INPUTS } from "../defaults";
 import {
+  calcAmortizationForMonth,
   calcCarryAnalysis,
   calcMonthlyBreakdown,
   calcMonthlyPayment,
@@ -37,6 +38,28 @@ test("computes true monthly ownership cost excluding principal paydown", () => {
   const nonMortgageCosts = monthly.propertyTax + monthly.maintenance + monthly.insurance + monthly.hoa;
   expect(Math.abs(monthly.trueOwnershipCost + monthly.principal - (monthly.principalAndInterest + nonMortgageCosts))).toBeLessThan(1e-8);
   expect(Math.abs(monthly.totalOwnerCashOutflow - (monthly.principalAndInterest + nonMortgageCosts))).toBeLessThan(1e-8);
+});
+
+test("first-payment amortization matches standard interest-on-opening-balance", () => {
+  const loanAmount = 400_000;
+  const annualRate = 0.06;
+  const termYears = 30;
+  const payment = calcMonthlyPayment(loanAmount, annualRate, termYears);
+  const { interest, principal } = calcAmortizationForMonth(loanAmount, annualRate, termYears, 0);
+  expect(interest).toBeCloseTo(loanAmount * (annualRate / 12), 8);
+  expect(principal).toBeCloseTo(payment - interest, 8);
+});
+
+test("year-one average P&I split sums to the monthly payment", () => {
+  const monthly = calcMonthlyBreakdown(DEFAULT_INPUTS);
+  expect(
+    monthly.interestYearOneMonthlyAvg + monthly.principalYearOneMonthlyAvg,
+  ).toBeCloseTo(monthly.principalAndInterest, 8);
+});
+
+test("principal portion rises on average through year one for a typical mortgage", () => {
+  const monthly = calcMonthlyBreakdown(DEFAULT_INPUTS);
+  expect(monthly.principalYearOneMonthlyAvg).toBeGreaterThan(monthly.principal);
 });
 
 test("classifies carry using documented thresholds", () => {

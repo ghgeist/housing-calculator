@@ -56,6 +56,64 @@ export function calcMonthlyPayment(principal: number, annualRate: number, termYe
   return principal * (monthlyRate * compoundFactor) / (compoundFactor - 1);
 }
 
+/**
+ * Interest and principal portions of the scheduled payment for a given month (0 = first payment).
+ */
+export function calcAmortizationForMonth(
+  loanAmount: number,
+  annualRate: number,
+  termYears: number,
+  monthIndexZeroBased: number,
+): { interest: number; principal: number } {
+  const monthlyRate = annualRate / MONTHS_PER_YEAR;
+  const payment = calcMonthlyPayment(loanAmount, annualRate, termYears);
+
+  if (monthlyRate === 0) {
+    return { interest: 0, principal: payment };
+  }
+
+  let balance = loanAmount;
+  for (let m = 0; m < monthIndexZeroBased; m++) {
+    const interestPortion = balance * monthlyRate;
+    let principalPortion = payment - interestPortion;
+    if (principalPortion > balance) {
+      principalPortion = balance;
+    }
+    balance -= principalPortion;
+  }
+
+  if (balance <= 0) {
+    return { interest: 0, principal: 0 };
+  }
+
+  const interestPortion = balance * monthlyRate;
+  let principalPortion = payment - interestPortion;
+  if (principalPortion > balance) {
+    principalPortion = balance;
+  }
+
+  return { interest: interestPortion, principal: principalPortion };
+}
+
+function averageYearOneAmortizationSplit(
+  loanAmount: number,
+  annualRate: number,
+  termYears: number,
+): { interestYearOneMonthlyAvg: number; principalYearOneMonthlyAvg: number } {
+  const months = Math.min(MONTHS_PER_YEAR, termYears * MONTHS_PER_YEAR);
+  let interestSum = 0;
+  let principalSum = 0;
+  for (let m = 0; m < months; m++) {
+    const { interest, principal } = calcAmortizationForMonth(loanAmount, annualRate, termYears, m);
+    interestSum += interest;
+    principalSum += principal;
+  }
+  return {
+    interestYearOneMonthlyAvg: interestSum / months,
+    principalYearOneMonthlyAvg: principalSum / months,
+  };
+}
+
 export function calcRemainingBalance(
   principal: number,
   annualRate: number,
@@ -93,8 +151,17 @@ export function calcMonthlyBreakdown(inputs: HousingInputs): MonthlyBreakdown {
   const annualMortgageRate = toRate(mortgageRate);
 
   const principalAndInterest = calcMonthlyPayment(loanAmount, annualMortgageRate, mortgageTerm);
-  const interest = loanAmount * (annualMortgageRate / MONTHS_PER_YEAR);
-  const principal = principalAndInterest - interest;
+  const { interest, principal } = calcAmortizationForMonth(
+    loanAmount,
+    annualMortgageRate,
+    mortgageTerm,
+    0,
+  );
+  const { interestYearOneMonthlyAvg, principalYearOneMonthlyAvg } = averageYearOneAmortizationSplit(
+    loanAmount,
+    annualMortgageRate,
+    mortgageTerm,
+  );
 
   const propertyTax = homePrice * toRate(propertyTaxRate) / MONTHS_PER_YEAR;
   const maintenance = homePrice * toRate(maintenanceRate) / MONTHS_PER_YEAR;
@@ -109,6 +176,8 @@ export function calcMonthlyBreakdown(inputs: HousingInputs): MonthlyBreakdown {
     principalAndInterest,
     interest,
     principal,
+    interestYearOneMonthlyAvg,
+    principalYearOneMonthlyAvg,
     propertyTax,
     maintenance,
     insurance,
