@@ -59,7 +59,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   };
 
   return (
-    <div className="results-panel">
+    <div className="results-panel" id="results">
       <div className="hero-section">
         <div className="hero-premium">
           {isOwningCheaper ? (

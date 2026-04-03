@@ -62,7 +62,8 @@ body {
 .app-header {
   border-bottom: 1px solid var(--border);
   background: var(--surface);
-  padding: 28px 24px;
+  padding: max(28px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 28px
+    max(24px, env(safe-area-inset-left));
 }
 
 .header-inner {
@@ -86,7 +87,7 @@ body {
 
 .app-main {
   flex: 1;
-  padding: 32px 24px;
+  padding: 32px max(24px, env(safe-area-inset-right)) 32px max(24px, env(safe-area-inset-left));
   max-width: 1180px;
   margin: 0 auto;
   width: 100%;
@@ -111,7 +112,8 @@ body {
 }
 
 .app-footer {
-  padding: 20px 24px;
+  padding: 20px max(24px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
@@ -135,6 +137,10 @@ body {
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: var(--shadow);
+}
+
+.results-panel {
+  scroll-margin-top: 12px;
 }
 
 .panel-header {
@@ -362,19 +368,18 @@ body {
   color: var(--text-muted);
 }
 
-/* Tooltips */
-.tooltip-wrapper {
-  position: relative;
-}
-
+/* Field help (Radix Popover: tap / keyboard friendly on mobile) */
 .tooltip-trigger {
-  width: 16px;
-  height: 16px;
+  box-sizing: border-box;
+  min-width: 28px;
+  min-height: 28px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface-2);
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -390,20 +395,16 @@ body {
   color: var(--accent);
 }
 
-.tooltip-content {
-  position: absolute;
-  left: 20px;
-  top: -4px;
-  z-index: 100;
-  background: var(--text-primary);
-  color: #fff;
-  padding: 8px 12px;
+.field-help-popover-content {
+  max-width: min(18rem, calc(100vw - 1.5rem));
+  background: var(--text-primary) !important;
+  color: #fff !important;
+  border-color: var(--text-primary) !important;
+  padding: 10px 12px !important;
   border-radius: var(--radius-sm);
   font-size: 12px;
-  line-height: 1.4;
-  width: 220px;
+  line-height: 1.45;
   box-shadow: var(--shadow-md);
-  pointer-events: none;
 }
 
 /* ============================================================
@@ -422,6 +423,7 @@ body {
   gap: 10px;
   margin-bottom: 12px;
   flex-wrap: wrap;
+  row-gap: 8px;
 }
 
 .hero-amount {
@@ -539,8 +541,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
   padding: 7px 0;
   border-bottom: 1px solid var(--border);
+}
+
+.detail-label,
+.detail-value {
+  min-width: 0;
 }
 
 .detail-row:last-child {
@@ -664,8 +673,10 @@ body {
 }
 
 .chart-tooltip-name {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .chart-tooltip-value {
@@ -747,13 +758,38 @@ body {
    Responsive
    ============================================================ */
 
+.jump-to-results {
+  display: none;
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.jump-to-results:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
 @media (max-width: 860px) {
   .layout-grid {
     grid-template-columns: 1fr;
   }
 
+  .panel-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Show headline results before the form on small screens */
+  .layout-results {
+    order: 1;
+  }
+
   .layout-inputs {
     position: static;
+    order: 2;
   }
 
   .stats-grid {
@@ -761,11 +797,49 @@ body {
   }
 
   .app-main {
-    padding: 16px;
+    padding: 16px max(16px, env(safe-area-inset-right)) 16px max(16px, env(safe-area-inset-left));
   }
 
   .hero-amount {
     font-size: 32px;
+  }
+
+  /* iOS: avoid auto-zoom on focus when font size would be < 16px */
+  .number-input,
+  .input-prefix,
+  .input-suffix {
+    font-size: 16px;
+  }
+
+  /* ~44px minimum touch targets */
+  .tooltip-trigger {
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 13px;
+  }
+
+  .reset-btn {
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .preset-btn {
+    min-height: 44px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .choice-btn {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .jump-to-results {
+    display: inline-block;
   }
 }
 
@@ -775,7 +849,18 @@ body {
   }
 
   .app-header {
-    padding: 20px 16px;
+    padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 20px
+      max(16px, env(safe-area-inset-left));
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+
+  .detail-value {
+    text-align: right;
   }
 }
 
