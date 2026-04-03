@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { DEFAULT_INPUTS } from "../defaults.js";
+import { DEFAULT_INPUTS } from "../defaults";
 import {
   calcCarryAnalysis,
   calcMonthlyBreakdown,
@@ -8,7 +8,7 @@ import {
   calcRemainingBalance,
   calcYearlyComparison,
   runModel,
-} from "./model.js";
+} from "./model";
 
 test("calculates monthly mortgage payment", () => {
   const payment = calcMonthlyPayment(400_000, 0.06, 30);

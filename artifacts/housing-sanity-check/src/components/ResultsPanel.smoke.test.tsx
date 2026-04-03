@@ -1,9 +1,10 @@
+import React from "react";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
-import { ResultsPanel } from "./ResultsPanel.js";
-import { DEFAULT_INPUTS } from "../lib/defaults.js";
-import { runModel } from "../lib/housing/model.js";
+import { ResultsPanel } from "./ResultsPanel";
+import { DEFAULT_INPUTS } from "../lib/defaults";
+import { runModel } from "../lib/housing/model";
 
 test("renders positive carry badge and cheaper-to-own copy", () => {
   const inputs = {

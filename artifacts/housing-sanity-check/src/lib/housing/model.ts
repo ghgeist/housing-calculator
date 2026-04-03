@@ -6,7 +6,7 @@ import type {
   MonthlyBreakdown,
   PropertyCostBasis,
   YearlyComparison,
-} from "../../types/housing.js";
+} from "../../types/housing";
 
 const MONTHS_PER_YEAR = 12;
 const POSITIVE_CARRY_THRESHOLD = 0.005;

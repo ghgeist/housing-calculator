@@ -1,4 +1,4 @@
-import type { HousingInputs } from "../types/housing.js";
+import type { HousingInputs } from "../types/housing";
 
 export const DEFAULT_INPUTS: HousingInputs = {
   homePrice: 750000,

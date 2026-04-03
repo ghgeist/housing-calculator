@@ -63,7 +63,7 @@ PORT=5173 BASE_PATH=/ pnpm --filter @workspace/housing-sanity-check run build
 
 ## Tests
 
-Run model tests:
+Run tests:
 
 ```bash
 pnpm --filter @workspace/housing-sanity-check run test

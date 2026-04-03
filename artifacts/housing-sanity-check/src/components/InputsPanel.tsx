@@ -208,14 +208,22 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
           label="Tax & maintenance base"
           tooltip="Choose whether property tax and maintenance are modeled from the original purchase price or from the home's current appreciated value each year."
         >
-          <select
-            className="number-input"
-            value={inputs.propertyCostBasis}
-            onChange={(e) => updatePropertyCostBasis(e.target.value as PropertyCostBasis)}
-          >
-            <option value="purchase">Purchase price (default)</option>
-            <option value="currentValue">Current home value</option>
-          </select>
+          <div className="choice-row" role="group" aria-label="Tax and maintenance basis">
+            <button
+              type="button"
+              className={`choice-btn ${inputs.propertyCostBasis === "purchase" ? "choice-btn-active" : ""}`}
+              onClick={() => updatePropertyCostBasis("purchase")}
+            >
+              Purchase price
+            </button>
+            <button
+              type="button"
+              className={`choice-btn ${inputs.propertyCostBasis === "currentValue" ? "choice-btn-active" : ""}`}
+              onClick={() => updatePropertyCostBasis("currentValue")}
+            >
+              Current value
+            </button>
+          </div>
         </Field>
       </div>
 
