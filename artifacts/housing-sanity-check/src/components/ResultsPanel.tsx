@@ -1,7 +1,7 @@
 import React, { useId, useState } from "react";
 import type { ModelResults, HousingInputs } from "../types/housing";
 import { formatCurrency, formatPercent } from "../lib/format";
-import { useIsMobile } from "../hooks/use-mobile";
+import { RESULTS_SECTION_ID } from "../lib/sectionAnchors";
 
 interface ResultsPanelProps {
   results: ModelResults;
@@ -94,7 +94,6 @@ function CollapsibleResultSection({
 }
 
 export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
-  const isCompact = useIsMobile();
   const { monthly, premiumVsRent, carry, ltv } = results;
   const isOwningCheaper = premiumVsRent < 0;
   const premiumAbs = Math.abs(premiumVsRent);
@@ -107,7 +106,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   };
 
   return (
-    <div className="results-panel" id="results">
+    <div className="results-panel" id={RESULTS_SECTION_ID}>
       <div className="results-hero-section">
         <div className="hero-premium">
           {isOwningCheaper ? (
@@ -207,11 +206,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <CollapsibleResultSection
           sectionId="money-at-exit"
           defaultOpen={false}
-          title={
-            isCompact
-              ? `Money back at exit (${inputs.holdingPeriod}y summary)`
-              : `Money back at exit (${inputs.holdingPeriod}-year summary)`
-          }
+          title={`Money back at exit (${inputs.holdingPeriod}-year summary)`}
         >
           <div className="detail-list">
             <DetailRow

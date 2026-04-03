@@ -12,6 +12,7 @@ import {
   committedNumberDisplayDollars,
 } from "@/lib/numberInputCommit";
 import { housingInputsEqual } from "@/lib/housingInputsEqual";
+import { INPUTS_SECTION_ID } from "@/lib/sectionAnchors";
 
 interface InputsPanelProps {
   inputs: HousingInputs;
@@ -180,7 +181,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
   const loanAmount = inputs.homePrice - downPaymentAmount;
 
   return (
-    <div className="inputs-panel" id="inputs-start">
+    <div className="inputs-panel" id={INPUTS_SECTION_ID}>
       <div className="panel-header">
         <h2 className="panel-title">Your numbers</h2>
         <div className="panel-header-actions">
