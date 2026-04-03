@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId, useState } from "react";
 import type { ModelResults, HousingInputs } from "../types/housing";
 import { formatCurrency, formatPercent } from "../lib/format";
 
@@ -46,6 +46,48 @@ function DetailRow({ label, value, muted }: { label: string; value: string; mute
     <div className={`detail-row ${muted ? "detail-row-muted" : ""}`}>
       <span className="detail-label">{label}</span>
       <span className="detail-value">{value}</span>
+    </div>
+  );
+}
+
+function CollapsibleResultSection({
+  sectionId,
+  defaultOpen = true,
+  title,
+  children,
+}: {
+  sectionId: string;
+  defaultOpen?: boolean;
+  title: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const reactId = useId();
+  const labelId = `${sectionId}-${reactId}-label`;
+  const panelId = `${sectionId}-${reactId}-panel`;
+
+  return (
+    <div className="results-disclosure" data-open={open}>
+      <button
+        type="button"
+        id={labelId}
+        className="results-disclosure-summary"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="results-disclosure-chevron" aria-hidden />
+        <span className="section-title results-disclosure-title">{title}</span>
+      </button>
+      <div
+        id={panelId}
+        className="results-disclosure-body"
+        role="region"
+        aria-labelledby={labelId}
+        aria-hidden={!open}
+      >
+        <div className="results-disclosure-inner">{children}</div>
+      </div>
     </div>
   );
 }
@@ -118,8 +160,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         />
       </div>
 
-      <div className="detail-section">
-        <h3 className="section-title">Monthly breakdown</h3>
+      <CollapsibleResultSection sectionId="monthly-breakdown" defaultOpen title="Monthly breakdown">
         <div className="detail-list">
           <h4 className="breakdown-subheading">Living costs</h4>
           <DetailRow label="Mortgage interest" value={formatCurrency(monthly.interest)} />
@@ -133,7 +174,11 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           />
 
           <h4 className="breakdown-subheading">Equity (not a cost)</h4>
-          <DetailRow label="Principal paydown (builds equity, not a cost)" value={formatCurrency(monthly.principal)} muted />
+          <DetailRow
+            label="Principal paydown (builds equity, not a cost)"
+            value={formatCurrency(monthly.principal)}
+            muted
+          />
           <DetailRow
             label="Mortgage payment (principal + interest)"
             value={formatCurrency(monthly.principalAndInterest)}
@@ -147,11 +192,14 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           Living costs are what you pay to occupy the home. Principal turns cash into home equity—it’s not a cost of
           living in the home. Total owner cash outflow is everything that left your account this month.
         </p>
-      </div>
+      </CollapsibleResultSection>
 
       {finalYear && (
-        <div className="detail-section">
-          <h3 className="section-title">Money back at exit</h3>
+        <CollapsibleResultSection
+          sectionId="money-at-exit"
+          defaultOpen={false}
+          title={`Money back at exit (${inputs.holdingPeriod}-year summary)`}
+        >
           <div className="detail-list">
             <DetailRow
               label={`Owner cash in over ${inputs.holdingPeriod} years`}
@@ -159,17 +207,19 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
             />
             <DetailRow label="Estimated net sale proceeds" value={formatCurrency(finalYear.netEquity, true)} />
             <div className="detail-divider" />
-            <DetailRow label="Modeled net owner cost over hold" value={formatCurrency(finalYear.ownerNetCost, true)} />
+            <DetailRow
+              label="Modeled net owner cost over hold"
+              value={formatCurrency(finalYear.ownerNetCost, true)}
+            />
           </div>
           <p className="detail-note">
             Cash back uses the estimated sale price after selling costs and paying off the loan. Home equity is value on
             paper until you sell or borrow against it.
           </p>
-        </div>
+        </CollapsibleResultSection>
       )}
 
-      <div className="detail-section">
-        <h3 className="section-title">Carry snapshot</h3>
+      <CollapsibleResultSection sectionId="carry-advanced" defaultOpen={false} title="Carry (advanced)">
         <div className="detail-list">
           <DetailRow label="Rent as % of home price (annual)" value={formatPercent(carry.imputedRentYield * 100)} />
           <DetailRow
@@ -187,7 +237,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           mortgage (by loan size), taxes, upkeep, insurance, and HOA. The net line compares those two percentages—not your
           day-to-day bank balance.
         </p>
-      </div>
+      </CollapsibleResultSection>
     </div>
   );
 }

@@ -753,6 +753,91 @@ body {
   margin: 0;
 }
 
+/* Results panel: collapsible sections (<details>) */
+.results-disclosure {
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-disclosure:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.results-disclosure-summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 2px 0;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+  user-select: none;
+}
+
+.results-disclosure-summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.results-disclosure-chevron {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--text-muted);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.results-disclosure[data-open="true"] .results-disclosure-chevron {
+  transform: rotate(90deg);
+}
+
+.results-disclosure-title {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.results-disclosure[data-open="true"] .results-disclosure-summary {
+  margin-bottom: 14px;
+}
+
+.results-disclosure-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease-out;
+}
+
+.results-disclosure[data-open="true"] .results-disclosure-body {
+  grid-template-rows: 1fr;
+}
+
+.results-disclosure-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .results-disclosure-body {
+    transition: none;
+  }
+
+  .results-disclosure-chevron {
+    transition: none;
+  }
+}
+
 /* ============================================================
    Chart
    ============================================================ */
