@@ -74,14 +74,25 @@ Be cautious changing:
 
 Use the existing package manager and scripts in the repo.
 
-Typical commands should be:
+**Package manager:** this workspace uses **pnpm** only (`preinstall` rejects npm/yarn). Use `pnpm install` from the repo root.
 
-- install dependencies
-- run dev server
-- run tests
-- build project
+Typical commands from the **repo root**:
 
-If scripts are missing or unclear, add the minimum needed to make the repo easy to run.
+- `pnpm install` — install dependencies
+- `pnpm typecheck` — TypeScript across projects
+- `pnpm lint` / `pnpm lint:fix` — ESLint
+- `pnpm test` / `pnpm test:run` — Vitest (all tests; `test:run` is CI-friendly)
+- `pnpm build` — build (as defined in root `package.json`)
+
+Tests live next to source under `artifacts/**`, `lib/**`, or `scripts/**` as `*.test.ts` / `*.test.tsx` (or `*.spec.*`). Vitest is configured at the root; **`pnpm test` runs from the root**, not from `npm` inside a single package.
+
+### `artifacts/housing-sanity-check` (own vs rent UI)
+
+The polished calculator UI may live under `artifacts/housing-sanity-check` (path and package name can vary).
+
+- **Number fields:** `InputsPanel` uses a **draft string + commit on blur** pattern with `src/lib/numberInputCommit.ts`. Do not revert to `parseFloat` on every `onChange`; it breaks typing and empty fields.
+- **Reset / dirty checks:** use `housingInputsEqual` from `src/lib/housingInputsEqual.ts` instead of hand-comparing each field of `HousingInputs` (avoids silent bugs when the type gains a property).
+- **Tests:** from that package, `pnpm test` delegates to the root Vitest run for this artifact only (`pnpm -w exec vitest run artifacts/housing-sanity-check`). Prefer **Vitest** (`expect` from `vitest`); do not use `node:test` for new tests.
 
 ## Documentation expectations
 

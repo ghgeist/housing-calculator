@@ -1,6 +1,5 @@
 import React from "react";
-import test from "node:test";
-import assert from "node:assert/strict";
+import { expect, test } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ResultsPanel } from "./ResultsPanel";
 import { DEFAULT_INPUTS } from "../lib/defaults";
@@ -15,10 +14,10 @@ test("renders positive carry badge and cheaper-to-own copy", () => {
 
   const html = renderToStaticMarkup(<ResultsPanel results={results} inputs={inputs} />);
 
-  assert.match(html, /Positive Carry/);
-  assert.match(html, /badge-positive/);
-  assert.match(html, /cheaper to own than rent/);
-  assert.match(html, /hero-positive/);
+  expect(html).toMatch(/Positive Carry/);
+  expect(html).toMatch(/badge-positive/);
+  expect(html).toMatch(/cheaper to own than rent/);
+  expect(html).toMatch(/hero-positive/);
 });
 
 test("renders negative carry badge and more-expensive-to-own copy", () => {
@@ -30,8 +29,8 @@ test("renders negative carry badge and more-expensive-to-own copy", () => {
 
   const html = renderToStaticMarkup(<ResultsPanel results={results} inputs={inputs} />);
 
-  assert.match(html, /Negative Carry/);
-  assert.match(html, /badge-negative/);
-  assert.match(html, /more expensive to own than rent/);
-  assert.match(html, /hero-negative/);
+  expect(html).toMatch(/Negative Carry/);
+  expect(html).toMatch(/badge-negative/);
+  expect(html).toMatch(/more expensive to own than rent/);
+  expect(html).toMatch(/hero-negative/);
 });
