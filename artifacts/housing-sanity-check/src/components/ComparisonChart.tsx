@@ -88,13 +88,13 @@ export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartP
         <div className="chart-summary">
           {ownerWins ? (
             <span className="chart-summary-win">
-              In this run, owning is about{" "}
+              In this scenario, owning is about{" "}
               {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
               {data.length} years
             </span>
           ) : (
             <span className="chart-summary-lose">
-              In this run, {investMonthlySavings ? "renting + investing" : "renting"} is about{" "}
+              In this scenario, {investMonthlySavings ? "renting + investing" : "renting"} is about{" "}
               {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
               {data.length} years
             </span>

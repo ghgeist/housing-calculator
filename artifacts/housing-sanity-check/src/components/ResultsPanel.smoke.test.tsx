@@ -35,6 +35,6 @@ test("renders negative carry badge and more-expensive-to-own copy", () => {
   expect(html).toMatch(/badge-negative/);
   expect(html).toMatch(/more expensive to own than rent/);
   expect(html).toMatch(/hero-negative/);
-  expect(html).toMatch(/spread metric/);
+  expect(html).toMatch(/ownership premium/);
   expect(html).toMatch(/Estimated net sale proceeds/);
 });

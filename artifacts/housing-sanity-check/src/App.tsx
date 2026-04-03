@@ -61,36 +61,48 @@ function App() {
 
             <div className="framing-note">
               <h3 className="framing-title">What you&apos;re looking at</h3>
-              <p>
-                <strong>Monthly reality</strong>: interest, taxes, upkeep, insurance, and HOA versus the monthly rent
-                you assign for a comparable place (your estimate from the form). A home is something you live in and
-                pay for; this is not a pitch that owning always beats the market.
-              </p>
+              <ul className="framing-bullets">
+                <li>
+                  <strong>Monthly reality</strong> compares what it really costs to live in the home (interest, taxes,
+                  upkeep, insurance, HOA) to the comparable rent you enter.
+                </li>
+                <li>
+                  <strong>Principal</strong> pays down the loan and builds equity—it isn’t counted in{" "}
+                  <strong>true monthly cost</strong>, which is about living costs, not building ownership.
+                </li>
+                <li>
+                  <strong>Results</strong> depend heavily on your rent assumption and the other inputs you choose.
+                </li>
+                <li>
+                  This is a <strong>structure model</strong> for comparing scenarios, not a prediction of market
+                  outcomes.
+                </li>
+              </ul>
               <details className="framing-methodology">
                 <summary className="framing-methodology-summary">
                   More on carry, the chart, and true monthly cost
                 </summary>
                 <p>
-                  <strong>True monthly cost</strong> leaves out principal paydown because that turns cash into equity,
-                  not day-to-day spending. The chart compares two straight stories: you own, or you rent and{" "}
+                  <strong>True monthly cost</strong> leaves out principal because that turns cash into home equity—not
+                  part of what you spend to live there month to month. The chart compares two straight stories: you own,
+                  or you rent and{" "}
                   {inputs.investMonthlySavings
                     ? "invest the upfront cash plus any positive monthly savings."
                     : "invest the upfront cash only, without auto-investing monthly savings."}{" "}
                   Neither path is automatically right. The point is to make the tradeoff visible.
                 </p>
-                <ul>
+                <ul className="framing-methodology-bullets">
                   <li>
-                    <strong>Positive Carry</strong>: implied rent yield is above modeled financing and ownership drag.
-                    That is a favorable spread, not a promise about personal cash flow.
-                  </li>
-                  <li>
-                    <strong>Near Neutral</strong>: the spread is roughly balanced. Owning and renting are closer on this
-                    lens.
-                  </li>
-                  <li>
-                    <strong>Negative Carry</strong>: implied rent yield is below modeled ownership drag. It means you
-                    are paying an ownership premium on this spread metric, not that your household has negative free cash
+                    <strong>Positive Carry</strong>: rent as a share of home price is above modeled mortgage and
+                    ownership costs. That’s a favorable comparison on this lens—not a promise about your personal cash
                     flow.
+                  </li>
+                  <li>
+                    <strong>Near Neutral</strong>: those two ideas are close to even on this view.
+                  </li>
+                  <li>
+                    <strong>Negative Carry</strong>: rent as a share of home price is below modeled ownership costs—an
+                    ownership premium on this comparison, not the same as negative cash flow in daily life.
                   </li>
                 </ul>
               </details>

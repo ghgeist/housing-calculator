@@ -22,7 +22,8 @@ export const DEFAULT_INPUTS: HousingInputs = {
 export const PRESETS: { label: string; description: string; inputs: Partial<HousingInputs> }[] = [
   {
     label: "Low-Rate Regime",
-    description: "Mortgage rates around 3-4%. Favorable financing conditions.",
+    description:
+      "Sets a ~3.5% mortgage, higher appreciation, and a slightly lower investment-return assumption—meant to mimic cheaper financing conditions.",
     inputs: {
       mortgageRate: 3.5,
       investmentReturnRate: 6.0,
@@ -31,7 +32,8 @@ export const PRESETS: { label: string; description: string; inputs: Partial<Hous
   },
   {
     label: "Current Regime",
-    description: "Elevated mortgage rates, still-high prices. Typical 2024-2025 market.",
+    description:
+      "Elevated mortgage (~6.75%), moderate appreciation, and baseline investment return—roughly a 2024–2025-style setup.",
     inputs: {
       mortgageRate: 6.75,
       investmentReturnRate: 7.0,
@@ -40,7 +42,8 @@ export const PRESETS: { label: string; description: string; inputs: Partial<Hous
   },
   {
     label: "Price Correction",
-    description: "Prices drop 15%, rents stabilize. What if the market softens?",
+    description:
+      "15% lower home price, a slightly lower mortgage rate, and slower appreciation and rent growth—a softer-market what-if.",
     inputs: {
       homePrice: 637500,
       mortgageRate: 6.0,
