@@ -59,7 +59,30 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   };
 
   return (
-    <div className="results-panel">
+    <div className="results-panel" id="results">
+      <div className="stats-grid">
+        <StatCard
+          label="Mortgage payment"
+          value={formatCurrency(monthly.principalAndInterest)}
+          sub="Principal + interest (P&I)"
+        />
+        <StatCard
+          label="True monthly cost"
+          value={formatCurrency(monthly.trueOwnershipCost)}
+          sub="Interest, taxes, upkeep, insurance"
+        />
+        <StatCard
+          label="Comparable rent"
+          value={formatCurrency(inputs.monthlyRent)}
+          sub="What you would pay to rent instead"
+        />
+        <StatCard
+          label="Down Payment"
+          value={formatCurrency(inputs.homePrice * inputs.downPaymentPct / 100)}
+          sub={`${formatPercent(inputs.downPaymentPct, 0)} · LTV ${formatPercent(ltv * 100, 0)}`}
+        />
+      </div>
+
       <div className="hero-section">
         <div className="hero-premium">
           {isOwningCheaper ? (
@@ -82,29 +105,6 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         </div>
         <CarryBadge status={carry.status} />
         <p className="carry-explanation">{carryExplanation[carry.status]}</p>
-      </div>
-
-      <div className="stats-grid">
-        <StatCard
-          label="Mortgage payment"
-          value={formatCurrency(monthly.principalAndInterest)}
-          sub="Principal + interest (P&I)"
-        />
-        <StatCard
-          label="True monthly cost"
-          value={formatCurrency(monthly.trueOwnershipCost)}
-          sub="Interest, taxes, upkeep, insurance"
-        />
-        <StatCard
-          label="Comparable rent"
-          value={formatCurrency(inputs.monthlyRent)}
-          sub="What you would pay to rent instead"
-        />
-        <StatCard
-          label="Down Payment"
-          value={formatCurrency(inputs.homePrice * inputs.downPaymentPct / 100)}
-          sub={`${formatPercent(inputs.downPaymentPct, 0)} · LTV ${formatPercent(ltv * 100, 0)}`}
-        />
       </div>
 
       <div className="detail-section">

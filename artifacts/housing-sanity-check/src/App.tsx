@@ -37,6 +37,9 @@ function App() {
             Plug in a few numbers and compare the monthly cash cost of owning with renting a comparable place. You type
             the rent you think matches this home; it is your estimate, not a market scrape.
           </p>
+          <a className="jump-to-results" href="#results">
+            Jump to results
+          </a>
         </div>
       </header>
 

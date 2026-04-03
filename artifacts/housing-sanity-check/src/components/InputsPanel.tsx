@@ -1,6 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import type { ReactNode } from "react";
 import type { HousingInputs, PropertyCostBasis } from "@/types/housing";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
 import { formatCurrency } from "@/lib/format";
 import { commitNumberFromDraft, committedNumberDisplay } from "@/lib/numberInputCommit";
@@ -25,7 +26,6 @@ function Field({
   connectLabelToControl?: boolean;
   children: ReactNode;
 }) {
-  const [showTip, setShowTip] = useState(false);
   const tooltipId = `${fieldId}-tooltip`;
   const labelEl = connectLabelToControl ? (
     <label className="field-label" htmlFor={fieldId}>
@@ -42,27 +42,27 @@ function Field({
       <div className="field-label-row">
         {labelEl}
         {tooltip && (
-          <div className="tooltip-wrapper">
-            <button
-              className="tooltip-trigger"
-              type="button"
-              aria-label={`More information: ${label}`}
-              aria-expanded={showTip}
-              aria-controls={tooltipId}
-              aria-describedby={showTip ? tooltipId : undefined}
-              onMouseEnter={() => setShowTip(true)}
-              onMouseLeave={() => setShowTip(false)}
-              onFocus={() => setShowTip(true)}
-              onBlur={() => setShowTip(false)}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="tooltip-trigger"
+                type="button"
+                aria-label={`More information: ${label}`}
+                aria-controls={tooltipId}
+              >
+                ?
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              id={tooltipId}
+              side="bottom"
+              align="start"
+              collisionPadding={16}
+              className="field-help-popover-content"
             >
-              ?
-            </button>
-            {showTip && (
-              <div className="tooltip-content" id={tooltipId} role="tooltip">
-                {tooltip}
-              </div>
-            )}
-          </div>
+              {tooltip}
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       {children}

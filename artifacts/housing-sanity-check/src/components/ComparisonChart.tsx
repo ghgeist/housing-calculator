@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 import type { YearlyComparison } from "@/types/housing";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { formatCurrency } from "@/lib/format";
 
 type TooltipPayloadEntry = NonNullable<TooltipProps<number, string>["payload"]>[number];
@@ -36,6 +37,17 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 }
 
 export function ComparisonChart({ data }: ComparisonChartProps) {
+  const isCompact = useIsMobile();
+  const chartMargin = isCompact
+    ? { top: 8, right: 8, left: 4, bottom: 16 }
+    : { top: 8, right: 16, left: 8, bottom: 8 };
+  const yAxisWidth = isCompact ? 56 : 60;
+  const legendFontSize = isCompact ? 11 : 12;
+  const ownerNetName = isCompact ? "Own (net)" : "Own: net cost";
+  const renterNetName = isCompact ? "Rent + invest" : "Rent + invest: net cost";
+  const homeEquityName = isCompact ? "Home equity" : "Home equity (net)";
+  const renterPortfolioName = isCompact ? "Renter fund" : "Renter portfolio";
+
   const chartData = data.map((d) => ({
     year: d.year,
     ownerNetCost: Math.round(d.ownerNetCost),
@@ -89,23 +101,27 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
       )}
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+        <LineChart data={chartData} margin={chartMargin}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
           <XAxis
             dataKey="year"
-            tick={{ fontSize: 12, fill: "var(--chart-axis)" }}
+            tick={{ fontSize: isCompact ? 11 : 12, fill: "var(--chart-axis)" }}
             tickLine={false}
             label={{ value: "Year", position: "insideBottom", offset: -4, fontSize: 11, fill: "var(--chart-axis)" }}
           />
           <YAxis
-            tick={{ fontSize: 11, fill: "var(--chart-axis)" }}
+            tick={{ fontSize: isCompact ? 10 : 11, fill: "var(--chart-axis)" }}
             tickLine={false}
             tickFormatter={(v: number) => formatCurrency(v, true)}
-            width={60}
+            width={yAxisWidth}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
+            wrapperStyle={{
+              fontSize: legendFontSize,
+              paddingTop: 12,
+              lineHeight: isCompact ? 1.35 : undefined,
+            }}
             formatter={(value: string | number) => (
               <span style={{ color: "var(--chart-axis)" }}>{value}</span>
             )}
@@ -121,7 +137,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           <Line
             type="monotone"
             dataKey="ownerNetCost"
-            name="Own: net cost"
+            name={ownerNetName}
             stroke="var(--chart-own)"
             strokeWidth={2.5}
             dot={false}
@@ -130,7 +146,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           <Line
             type="monotone"
             dataKey="renterNetCost"
-            name="Rent + invest: net cost"
+            name={renterNetName}
             stroke="var(--chart-rent)"
             strokeWidth={2.5}
             dot={false}
@@ -145,30 +161,34 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           Home equity versus what the renter&apos;s investments grew to. Paper wealth, not cash in hand.
         </p>
         <ResponsiveContainer width="100%" height={220}>
-          <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+          <LineChart data={chartData} margin={chartMargin}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
             <XAxis
               dataKey="year"
-              tick={{ fontSize: 12, fill: "var(--chart-axis)" }}
+              tick={{ fontSize: isCompact ? 11 : 12, fill: "var(--chart-axis)" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: "var(--chart-axis)" }}
+              tick={{ fontSize: isCompact ? 10 : 11, fill: "var(--chart-axis)" }}
               tickLine={false}
               tickFormatter={(v: number) => formatCurrency(v, true)}
-              width={60}
+              width={yAxisWidth}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
-              wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
+              wrapperStyle={{
+                fontSize: legendFontSize,
+                paddingTop: 12,
+                lineHeight: isCompact ? 1.35 : undefined,
+              }}
               formatter={(value: string | number) => (
-              <span style={{ color: "var(--chart-axis)" }}>{value}</span>
-            )}
+                <span style={{ color: "var(--chart-axis)" }}>{value}</span>
+              )}
             />
             <Line
               type="monotone"
               dataKey="homeEquity"
-              name="Home equity (net)"
+              name={homeEquityName}
               stroke="var(--chart-own)"
               strokeWidth={2}
               dot={false}
@@ -177,7 +197,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
             <Line
               type="monotone"
               dataKey="renterPortfolio"
-              name="Renter portfolio"
+              name={renterPortfolioName}
               stroke="var(--chart-rent)"
               strokeWidth={2}
               dot={false}

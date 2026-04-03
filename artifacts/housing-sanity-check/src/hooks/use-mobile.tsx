@@ -1,6 +1,7 @@
 import * as React from "react"
 
-const MOBILE_BREAKPOINT = 768
+/** Matches `app.css` compact layout breakpoint (`max-width: 860px`). */
+const MOBILE_BREAKPOINT = 861
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
