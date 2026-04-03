@@ -93,6 +93,10 @@ The polished calculator UI may live under `artifacts/housing-sanity-check` (path
 - **Number fields:** `InputsPanel` uses a **draft string + commit on blur** pattern with `src/lib/numberInputCommit.ts`. Do not revert to `parseFloat` on every `onChange`; it breaks typing and empty fields.
 - **Reset / dirty checks:** use `housingInputsEqual` from `src/lib/housingInputsEqual.ts` instead of hand-comparing each field of `HousingInputs` (avoids silent bugs when the type gains a property).
 - **Tests:** from that package, `pnpm test` delegates to the root Vitest run for this artifact only (`pnpm -w exec vitest run artifacts/housing-sanity-check`). Prefer **Vitest** (`expect` from `vitest`); do not use `node:test` for new tests.
+- **Mobile layout contract:** keep split layout at `>=861px`, stacked layout at `<=860px`. If you change this contract, update the Playwright mobile regression test in the same change.
+- **Section anchors:** keep section IDs centralized in `src/lib/sectionAnchors.ts`; keep mobile quick-jump targets aligned with those constants.
+- **Mobile regression tests:** run `pnpm test:mobile` from repo root when touching `App.tsx`, layout CSS, `InputsPanel`, `ResultsPanel`, or chart layout.
+- **E2E naming:** keep Playwright files in `artifacts/housing-sanity-check/e2e/` as `*.e2e.ts` so Vitest does not pick them up.
 
 ## Documentation expectations
 
