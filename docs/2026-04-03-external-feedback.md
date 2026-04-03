@@ -24,7 +24,7 @@ This document records qualitative product feedback on the housing calculator (as
 
 7. **Condo / HOA and borderline carry** — Meaningful **HOA** can swing the own-vs-rent story; until those fees are included, **carry** can read “barely green” for owning in a way that matches intuition once HOA is modeled.
 
-8. **How P&I is shown** — Some readers prefer **one amortized payment** mentally; breaking **principal vs interest** in the monthly breakdown can feel like extra moving parts even though both are contractually real each month.
+8. **How P&I is shown** — Some readers prefer **one amortized payment** mentally; breaking **principal vs interest** in the monthly breakdown can feel like extra moving parts even though both are contractually real each month. Follow-up feedback: a **single principal figure** can read as **static** even though the split **shifts every month**; readers may also be uneasy treating **interest and principal** like fixed line-item “costs.”
 
 9. **Location-based appreciation** — Interest in **metro- or market-specific** appreciation defaults (e.g. trade-association or other published series), with awareness that the tool’s sale-based path assumes a **liquidating** event.
 
@@ -56,7 +56,7 @@ Follow-through in `artifacts/housing-sanity-check` against this document: most *
 | §6 Discoverability | **Done** | Header cue, Step 1 intro, **Core scenario** open by default, presets, `#inputs-start` / jump link. |
 | §7 HOA / condos | **Done** | Field + helper copy (**condos/townhomes**); not the exact “mandatory for condos” wording. See **§16** for reserve/maintenance overlap. |
 | §16 HOA vs maintenance / comps | **Done** | `InputsPanel.tsx` tooltips + HOA field helper: avoid double-count with **maintenance rate**; rent-comp and **special assessment** caveats. |
-| §8 P&I presentation | **Done** | **Mortgage payment (P&I)** line after equity block; interest still under living costs. |
+| §8 P&I presentation | **Done** | **Mortgage payment split** block: fixed P&I, **1st-payment** principal, **year-1 monthly averages** for interest/principal (`calcAmortizationForMonth`, `MonthlyBreakdown` in `model.ts`). Living costs: **Mortgage interest (1st payment)**; true-cost card subtitle states first-payment convention. Copy clarifies split is **not** extra living cost lines. |
 | §9 Tax / insurance / HOA inputs | **Done** | Fields, tooltips, **tax & maintenance base** control. |
 | §10 Metro appreciation / redeploy | **Deferred** | Roadmap / data; partial illiquidity copy at exit. |
 | §11 Income tax / standard deduction | **Done** | Visible guardrail in **What you’re looking at** (`App.tsx`): taxes not modeled; most take standard deduction. |
@@ -178,6 +178,11 @@ Follow-through in `artifacts/housing-sanity-check` against this document: most *
 - **Presentation:** Add a **subtotal line** (“Mortgage payment (P&I)”) with expandable detail, or a **tooltip** that states both parts are paid monthly but only interest counts toward **consumed** cost.
 - **Scope:** Avoid blurring **principal into “cost”** in headline metrics; any consolidation should remain **visually** grouped, not mathematically merged into true monthly cost.
 
+**Addressed (follow-up, same release cycle):** External note that **principal looked static** and that **interest vs. principal** changes month to month (so line items can feel misleading).
+
+- **Model:** `calcAmortizationForMonth` plus **year-1 monthly averages** for interest and principal on `MonthlyBreakdown`; first month still drives **true monthly cost** (unchanged definition).
+- **UI (`ResultsPanel.tsx`):** **Mortgage interest (1st payment)** under living costs; separate **Mortgage payment split (changes every month)** with P&I, first-payment principal, and year-1 average interest/principal; footnote explains first-payment convention and rising typical principal paydown.
+
 ---
 
 ## 9. Insurance, property tax, and HOA as “missing” inputs (perception vs code)
@@ -292,3 +297,4 @@ Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over h
 - **2026-04-03** — Added note on **prepayment vs mortgage-rate** mental model, opportunity cost, and validation of scenario-style tools despite many coupled variables (third-party media mentioned only generically in the doc body).
 - **2026-04-03** — **Resolution summary** table (pickup map vs §1–§15). Updated §2 **Current behavior** for `investMonthlySavings`. Logged shipped copy: model stance + tax guardrail (`App.tsx`), prepayment line (`ResultsPanel.tsx`), deliberate **skip** of OER in UI, and `docs/README.md` index.
 - **2026-04-03** — Summary item **15** + **§16**: HOA as maintenance/reserves, double-count vs **maintenance rate**, rent bundles (utilities/cable), **special assessments**; resolution row and `InputsPanel.tsx` tooltips / HOA helper.
+- **2026-04-03** — **§8** follow-up: non-static P&I framing (year-1 average split, explicit **first-payment** labels, mortgage split section copy); resolution table row updated; summary **#8** extended with static-principal / moving-split note.
