@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import type { ReactNode } from "react";
 import type { HousingInputs, PropertyCostBasis } from "@/types/housing";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -6,7 +6,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import { commitNumberFromDraft, committedNumberDisplay } from "@/lib/numberInputCommit";
+import {
+  commitNumberFromDraft,
+  committedNumberDisplay,
+  committedNumberDisplayDollars,
+} from "@/lib/numberInputCommit";
 import { housingInputsEqual } from "@/lib/housingInputsEqual";
 
 interface InputsPanelProps {
@@ -82,6 +86,7 @@ function NumberInput({
   step = 1,
   min = 0,
   commitTransform,
+  dollars = false,
 }: {
   id: string;
   value: number;
@@ -91,18 +96,36 @@ function NumberInput({
   step?: number;
   min?: number;
   commitTransform?: (n: number) => number;
+  /** Whole-dollar fields: commas in display, `type="text"` + commit on blur/Enter. */
+  dollars?: boolean;
 }) {
-  const [draft, setDraft] = useState(() => committedNumberDisplay(committed));
+  const [draft, setDraft] = useState(() =>
+    dollars ? committedNumberDisplayDollars(committed) : committedNumberDisplay(committed),
+  );
 
   useEffect(() => {
-    setDraft(committedNumberDisplay(committed));
-  }, [committed]);
+    setDraft(dollars ? committedNumberDisplayDollars(committed) : committedNumberDisplay(committed));
+  }, [committed, dollars]);
 
-  function handleBlur() {
-    const next = commitNumberFromDraft(draft, committed, min, commitTransform);
-    setDraft(committedNumberDisplay(next));
+  function commit() {
+    let next = commitNumberFromDraft(draft, committed, min, commitTransform);
+    if (dollars) {
+      next = Math.max(min, Math.round(next));
+    }
+    setDraft(dollars ? committedNumberDisplayDollars(next) : committedNumberDisplay(next));
     if (next !== committed) {
       onChange(next);
+    }
+  }
+
+  function handleBlur() {
+    commit();
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.currentTarget.blur();
     }
   }
 
@@ -111,13 +134,16 @@ function NumberInput({
       {prefix && <span className="input-prefix">{prefix}</span>}
       <input
         id={id}
-        type="number"
+        type={dollars ? "text" : "number"}
         className="number-input"
         value={draft}
-        step={step}
-        min={min}
+        step={dollars ? undefined : step}
+        min={dollars ? undefined : min}
+        inputMode={dollars ? "decimal" : undefined}
+        autoComplete="off"
         onChange={(e: ChangeEvent<HTMLInputElement>) => setDraft(e.target.value)}
         onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
       />
       {suffix && <span className="input-suffix">{suffix}</span>}
     </div>
@@ -216,6 +242,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
               onChange={(v) => update("homePrice", v)}
               prefix="$"
               step={10000}
+              dollars
             />
           </Field>
           <Field
@@ -250,6 +277,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
                 prefix="$"
                 step={100}
                 min={0}
+                dollars
               />
               <p className="field-helper">
                 This drives the comparison. Use a truly comparable property (similar size, quality, and location).
@@ -341,6 +369,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
               prefix="$"
               step={100}
               min={0}
+              dollars
             />
           </Field>
           <Field
@@ -356,6 +385,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
                 prefix="$"
                 step={25}
                 min={0}
+                dollars
               />
               <p className="field-helper">Important for condos/townhomes. Can materially change results.</p>
             </div>

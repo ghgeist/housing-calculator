@@ -6,8 +6,13 @@
  * `blur`, sync from props in `useEffect` when the parent value changes (presets/reset).
  *
  * `commitNumberFromDraft`: on blur, parse the draft; empty or invalid input keeps the
- * previous committed value from props.
+ * previous committed value from props. Commas are stripped before parsing so dollar
+ * fields can show thousands separators.
  */
+function normalizeDraftForParse(trimmed: string): string {
+  return trimmed.replace(/,/g, "");
+}
+
 export function commitNumberFromDraft(
   draft: string,
   committed: number,
@@ -15,10 +20,16 @@ export function commitNumberFromDraft(
   transform?: (n: number) => number,
 ): number {
   const trimmed = draft.trim();
-  if (trimmed === "" || trimmed === "-" || trimmed === "." || trimmed === "-.") {
+  const normalized = normalizeDraftForParse(trimmed);
+  if (
+    normalized === "" ||
+    normalized === "-" ||
+    normalized === "." ||
+    normalized === "-."
+  ) {
     return committed;
   }
-  const parsed = parseFloat(trimmed);
+  const parsed = parseFloat(normalized);
   if (Number.isNaN(parsed)) {
     return committed;
   }
@@ -32,4 +43,12 @@ export function commitNumberFromDraft(
 /** Display string for the input when it is not being edited. */
 export function committedNumberDisplay(value: number): string {
   return String(value);
+}
+
+/** Whole-dollar display with US grouping (e.g. 400000 → "400,000"). */
+export function committedNumberDisplayDollars(value: number): string {
+  return new Intl.NumberFormat("en-US", {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }).format(Math.round(value));
 }
