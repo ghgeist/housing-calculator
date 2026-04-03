@@ -44,6 +44,14 @@ function App() {
       </header>
 
       <main className="app-main">
+        <nav className="mobile-quick-jump" aria-label="Mobile section navigation">
+          <a className="mobile-quick-jump-link" href="#inputs-start">
+            Inputs
+          </a>
+          <a className="mobile-quick-jump-link" href="#results">
+            Results
+          </a>
+        </nav>
         <div className="layout-grid">
           <aside className="layout-inputs">
             <InputsPanel

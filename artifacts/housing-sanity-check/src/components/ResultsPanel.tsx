@@ -1,6 +1,7 @@
 import React, { useId, useState } from "react";
 import type { ModelResults, HousingInputs } from "../types/housing";
 import { formatCurrency, formatPercent } from "../lib/format";
+import { useIsMobile } from "../hooks/use-mobile";
 
 interface ResultsPanelProps {
   results: ModelResults;
@@ -93,6 +94,7 @@ function CollapsibleResultSection({
 }
 
 export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
+  const isCompact = useIsMobile();
   const { monthly, premiumVsRent, carry, ltv } = results;
   const isOwningCheaper = premiumVsRent < 0;
   const premiumAbs = Math.abs(premiumVsRent);
@@ -174,6 +176,11 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           />
 
           <h4 className="breakdown-subheading">Equity (not a cost)</h4>
+          <p className="breakdown-hint">
+            Principal paydown isn’t its own field: it’s implied by the standard payment from home price, down payment,
+            mortgage rate, and term under <strong>Your numbers</strong>. The split shown is for the{" "}
+            <strong>first month</strong> on the starting loan balance (principal grows each month after that).
+          </p>
           <DetailRow
             label="Principal paydown (builds equity, not a cost)"
             value={formatCurrency(monthly.principal)}
@@ -191,7 +198,8 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <p className="detail-note">
           Living costs are what you pay to occupy the home. Principal turns cash into home equity—it’s not a cost of
           living in the home. Paying down principal is similar to earning your mortgage rate on that money, but it
-          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month.
+          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month,
+          including the full mortgage payment.
         </p>
       </CollapsibleResultSection>
 
@@ -199,7 +207,11 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <CollapsibleResultSection
           sectionId="money-at-exit"
           defaultOpen={false}
-          title={`Money back at exit (${inputs.holdingPeriod}-year summary)`}
+          title={
+            isCompact
+              ? `Money back at exit (${inputs.holdingPeriod}y summary)`
+              : `Money back at exit (${inputs.holdingPeriod}-year summary)`
+          }
         >
           <div className="detail-list">
             <DetailRow

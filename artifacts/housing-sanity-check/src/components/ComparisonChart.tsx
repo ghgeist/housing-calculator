@@ -40,10 +40,32 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartProps) {
   const isCompact = useIsMobile();
   const chartMargin = isCompact
-    ? { top: 8, right: 8, left: 4, bottom: 16 }
+    ? { top: 34, right: 8, left: 0, bottom: 12 }
     : { top: 8, right: 16, left: 8, bottom: 8 };
-  const yAxisWidth = isCompact ? 56 : 60;
+  const yAxisWidth = isCompact ? 52 : 60;
   const legendFontSize = isCompact ? 11 : 12;
+  const mainChartHeight = isCompact ? 332 : 300;
+  const wealthChartHeight = isCompact ? 252 : 220;
+  const legendProps = isCompact
+    ? {
+        layout: "horizontal" as const,
+        align: "left" as const,
+        verticalAlign: "top" as const,
+        wrapperStyle: {
+          fontSize: legendFontSize,
+          paddingTop: 0,
+          lineHeight: 1.3 as const,
+        },
+      }
+    : {
+        layout: "horizontal" as const,
+        align: "center" as const,
+        verticalAlign: "top" as const,
+        wrapperStyle: {
+          fontSize: legendFontSize,
+          paddingTop: 12,
+        },
+      };
   const ownerNetName = isCompact ? "Own (net)" : "Own: net cost";
   const renterNetName = isCompact ? "Rent path" : investMonthlySavings ? "Rent + invest: net cost" : "Rent path: net cost";
   const homeEquityName = isCompact ? "Home equity" : "Home equity (net)";
@@ -107,7 +129,7 @@ export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartP
         </div>
       )}
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={mainChartHeight}>
         <LineChart data={chartData} margin={chartMargin}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
           <XAxis
@@ -124,11 +146,7 @@ export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartP
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{
-              fontSize: legendFontSize,
-              paddingTop: 12,
-              lineHeight: isCompact ? 1.35 : undefined,
-            }}
+            {...legendProps}
             formatter={(value: string | number) => (
               <span style={{ color: "var(--chart-axis)" }}>{value}</span>
             )}
@@ -169,7 +187,7 @@ export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartP
             ? "Home equity versus what the renter's investments grew to. Balance-sheet value, not cash in hand."
             : "Home equity versus the renter's invested upfront capital. Balance-sheet value, not cash in hand."}
         </p>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={wealthChartHeight}>
           <LineChart data={chartData} margin={chartMargin}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
             <XAxis
@@ -185,11 +203,7 @@ export function ComparisonChart({ data, investMonthlySavings }: ComparisonChartP
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
-              wrapperStyle={{
-                fontSize: legendFontSize,
-                paddingTop: 12,
-                lineHeight: isCompact ? 1.35 : undefined,
-              }}
+              {...legendProps}
               formatter={(value: string | number) => (
                 <span style={{ color: "var(--chart-axis)" }}>{value}</span>
               )}

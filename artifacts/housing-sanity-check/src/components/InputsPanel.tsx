@@ -183,9 +183,11 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
     <div className="inputs-panel" id="inputs-start">
       <div className="panel-header">
         <h2 className="panel-title">Your numbers</h2>
-        <button className="reset-btn" onClick={reset} type="button">
-          Reset to defaults
-        </button>
+        <div className="panel-header-actions">
+          <button className="reset-btn" onClick={reset} type="button">
+            Reset to defaults
+          </button>
+        </div>
       </div>
 
       <div className="panel-intro panel-intro-step">
@@ -202,28 +204,31 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
       </div>
 
       <div className="presets-row">
-        <TooltipProvider delayDuration={200}>
-          <span className="presets-label">
-            Scenario:
-            <span className="presets-hint">Hover or focus for details · click to apply</span>
-          </span>
-          {PRESETS.map((preset, i) => (
-            <Tooltip key={preset.label}>
-              <TooltipTrigger asChild>
-                <button
-                  className="preset-btn"
-                  onClick={() => applyPreset(i)}
-                  type="button"
-                >
-                  {preset.label}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" align="start" collisionPadding={16} className="preset-tooltip">
-                {preset.description}
-              </TooltipContent>
-            </Tooltip>
-          ))}
-        </TooltipProvider>
+        <span className="presets-label">
+          Scenario:
+          <span className="presets-hint presets-hint-pointer">Hover or focus for details · click to apply</span>
+          <span className="presets-hint presets-hint-touch">Tap a preset to apply</span>
+        </span>
+        <div className="presets-chips">
+          <TooltipProvider delayDuration={200}>
+            {PRESETS.map((preset, i) => (
+              <Tooltip key={preset.label}>
+                <TooltipTrigger asChild>
+                  <button
+                    className="preset-btn"
+                    onClick={() => applyPreset(i)}
+                    type="button"
+                  >
+                    {preset.label}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" align="start" collisionPadding={16} className="preset-tooltip">
+                  {preset.description}
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </TooltipProvider>
+        </div>
       </div>
 
       <details className="inputs-disclosure inputs-section" open>
@@ -350,7 +355,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
           <Field
             fieldId="maintenanceRate"
             label="Maintenance rate"
-            tooltip="Annual maintenance and repairs as a percent of home value. A common rule of thumb is 1–2% per year."
+            tooltip="Annual upkeep as a percent of home value (often ~1–2% for many houses). If HOA dues already cover building upkeep and reserves, lower this or set to 0 to avoid double-counting. Add some back for expected special assessments or a thin reserve fund."
           >
             <NumberInput
               id="maintenanceRate"
@@ -375,7 +380,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
           <Field
             fieldId="monthlyHoa"
             label="Monthly HOA"
-            tooltip="Monthly HOA or condo association dues. Leave at 0 if not applicable."
+            tooltip="Association dues—often includes reserves for future repairs (similar in spirit to maintenance). Comparing to rent: note what rent includes (e.g. utilities, cable). If reserves are thin, expect assessments; you may reflect that with a non-zero maintenance rate."
           >
             <div className="field-with-note">
               <NumberInput
@@ -387,7 +392,9 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
                 min={0}
                 dollars
               />
-              <p className="field-helper">Important for condos/townhomes. Can materially change results.</p>
+              <p className="field-helper">
+                Important for condos/townhomes. Overlaps with maintenance when dues fund upkeep and reserves—avoid double-counting with the maintenance rate above.
+              </p>
             </div>
           </Field>
 
