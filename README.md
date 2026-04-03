@@ -49,16 +49,20 @@ From repo root:
 pnpm install
 ```
 
-Run the housing app (requires `PORT` and `BASE_PATH` because of workspace Vite config):
+Run the housing app (from repo root):
 
 ```bash
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/housing-sanity-check run dev
+pnpm dev
 ```
+
+Or from `artifacts/housing-sanity-check`: `pnpm dev`.
+
+Optional: set `PORT` (default `5173`) and `BASE_PATH` (default `/`) if the host assigns different values.
 
 Build:
 
 ```bash
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/housing-sanity-check run build
+pnpm --filter @workspace/housing-sanity-check run build
 ```
 
 ## Tests and lint
