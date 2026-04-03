@@ -38,6 +38,8 @@ This document records qualitative product feedback on the housing calculator (as
 
 14. **Prepayment vs “earning the mortgage rate”** — It is tempting to treat **extra principal** as a risk-free “investment” that **returns exactly the mortgage rate**; in practice **opportunity cost**, **liquidity**, **taxes**, and **what else you would do with the dollar** break a simple 1:1 story (personal finance media often surfaces one of these wrinkles). That supports the broader theme—**many coupled variables**—while still validating **deterministic scenario** tools as a worthwhile way to play with the tradeoffs.
 
+15. **HOA vs maintenance and rent comparability** — **HOA** is often mentally **maintenance-like** (operating costs plus **reserves for capital projects**, analogous to what a single-family owner should save for major repairs). That can **overlap** with the separate **maintenance rate** input: many users should **reduce or zero out maintenance** when dues already cover building upkeep and reserves. **Rent comparisons** are messier when HOA bundles **water, cable**, or other services a rental might price differently. **Special assessments** when reserves are thin effectively **add maintenance back**—users may need a non-zero maintenance (or mental add-on) for chronic under-reserving or one-off assessments.
+
 ---
 
 ## Resolution summary (as of 2026-04-03)
@@ -52,7 +54,8 @@ Follow-through in `artifacts/housing-sanity-check` against this document: most *
 | §4 Monte Carlo | **Deferred** | Framed as future / tradeoff; no feature. |
 | §5 Money back / lifetime interest | **Partial** | **Money back at exit** section (cumulative cash in, net proceeds, net owner cost) + illiquidity note. No dedicated **lifetime total interest** line yet. |
 | §6 Discoverability | **Done** | Header cue, Step 1 intro, **Core scenario** open by default, presets, `#inputs-start` / jump link. |
-| §7 HOA / condos | **Done** | Field + helper copy (**condos/townhomes**); not the exact “mandatory for condos” wording. |
+| §7 HOA / condos | **Done** | Field + helper copy (**condos/townhomes**); not the exact “mandatory for condos” wording. See **§16** for reserve/maintenance overlap. |
+| §16 HOA vs maintenance / comps | **Done** | `InputsPanel.tsx` tooltips + HOA field helper: avoid double-count with **maintenance rate**; rent-comp and **special assessment** caveats. |
 | §8 P&I presentation | **Done** | **Mortgage payment (P&I)** line after equity block; interest still under living costs. |
 | §9 Tax / insurance / HOA inputs | **Done** | Fields, tooltips, **tax & maintenance base** control. |
 | §10 Metro appreciation / redeploy | **Deferred** | Roadmap / data; partial illiquidity copy at exit. |
@@ -160,6 +163,8 @@ Follow-through in `artifacts/housing-sanity-check` against this document: most *
 - **Copy near HOA:** One line that HOA is **mandatory for condos** for a fair comparison to rent.
 - **Defaults:** Condo-oriented presets (higher HOA, maintenance) are optional and market-dependent; see `src/lib/defaults.ts`.
 
+**Related nuance:** See **§16** (HOA as maintenance-like reserves, double-counting **maintenance rate**, bundled services vs rent, special assessments).
+
 ---
 
 ## 8. Presenting principal and interest in the monthly breakdown
@@ -259,6 +264,21 @@ Follow-through in `artifacts/housing-sanity-check` against this document: most *
 
 ---
 
+## 16. HOA composition, maintenance overlap, and comparable rent
+
+**Observation (external, paraphrased):** Real-world **HOA** is often “complicated”: it may bundle **water, cable**, or other services that a **different rental building** might not include at the same rent—so **comparable rent** takes more judgment. Even so, for most cases HOA behaves like **maintenance** in spirit: operating costs plus **reserves for capital projects**, similar to what a **single-family owner** should mentally set aside for major repairs. That means the separate **maintenance** (and sometimes **insurance**) inputs may need to be **lower** when dues already cover those buckets—otherwise the model **double-counts**.
+
+**User guidance implied by the feedback:** If HOA fully covers building upkeep and healthy reserves, **set maintenance toward zero** (or materially reduce it). **Special assessments** and chronic **under-reserving** are the main reason to **add maintenance back**: when the association does not save enough for repairs or capex, owners pay **assessments** that act like lumpy maintenance.
+
+**Current behavior:** The model keeps **HOA** and **maintenance rate** as **separate additive lines** in true cost and cash outflow (`model.ts`); the product does not auto-net them. Clarity is therefore mostly **copy and user judgment**.
+
+**Possible directions:**
+
+- **Copy (shipped):** Tooltips / helper text on **maintenance rate** and **monthly HOA** explaining overlap, double-count risk, rent-comp bundles, and assessments.
+- **Future (optional):** A preset or inline example for “condo: HOA covers reserves, maintenance 0%” only if it stays simple and market-agnostic.
+
+---
+
 ## Scope discipline
 
 Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over heavy new infrastructure. Any change to **core metric definitions** or **carry thresholds** should stay deliberate, tested, and documented.
@@ -271,3 +291,4 @@ Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over h
 - **2026-04-03** — Added second-round notes: input discoverability, condo/HOA sensitivity, P&I presentation, appreciation/illiquidity, standard deduction, parameter ranges, peer comparison anecdotes, external rent-vs-own narratives, and owner-equivalent rent (including a user-supplied video link).
 - **2026-04-03** — Added note on **prepayment vs mortgage-rate** mental model, opportunity cost, and validation of scenario-style tools despite many coupled variables (third-party media mentioned only generically in the doc body).
 - **2026-04-03** — **Resolution summary** table (pickup map vs §1–§15). Updated §2 **Current behavior** for `investMonthlySavings`. Logged shipped copy: model stance + tax guardrail (`App.tsx`), prepayment line (`ResultsPanel.tsx`), deliberate **skip** of OER in UI, and `docs/README.md` index.
+- **2026-04-03** — Summary item **15** + **§16**: HOA as maintenance/reserves, double-count vs **maintenance rate**, rent bundles (utilities/cable), **special assessments**; resolution row and `InputsPanel.tsx` tooltips / HOA helper.

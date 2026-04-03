@@ -82,6 +82,33 @@ Housing app tests only:
 pnpm --filter @workspace/housing-sanity-check run test
 ```
 
+Mobile regression tests (Playwright):
+
+```bash
+pnpm test:mobile
+```
+
+Or run directly from the app package:
+
+```bash
+pnpm --filter @workspace/housing-sanity-check run test:e2e
+```
+
+First-time Playwright browser install:
+
+```bash
+pnpm --filter @workspace/housing-sanity-check run test:e2e:install
+```
+
+What mobile regression tests currently protect:
+- no horizontal overflow at key iPhone-class widths (`430`, `393`, `390`, `375`, `320`)
+- mobile quick-jump anchor behavior (`Inputs` / `Results`)
+- breakpoint contract (`861px` split layout, `860px` stacked layout)
+
+E2E file convention:
+- place Playwright specs under `artifacts/housing-sanity-check/e2e/`
+- use `*.e2e.ts` naming so Vitest does not accidentally execute Playwright files
+
 Lint:
 
 ```bash
@@ -92,6 +119,15 @@ Typecheck app package:
 
 ```bash
 pnpm --filter @workspace/housing-sanity-check run typecheck
+```
+
+### Test troubleshooting
+
+If Playwright or Vite fails locally due to missing native/optional bindings, run:
+
+```bash
+pnpm install
+pnpm --filter @workspace/housing-sanity-check run test:e2e:install
 ```
 
 ## What still needs work

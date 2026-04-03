@@ -12,7 +12,8 @@
     "lint:fix": "pnpm lint -- --fix",
     "test": "pnpm exec vitest",
     "test:run": "pnpm exec vitest run",
-    "test:watch": "pnpm exec vitest"
+    "test:watch": "pnpm exec vitest",
+    "test:mobile": "pnpm --filter @workspace/housing-sanity-check run test:e2e"
   },
   "private": true,
   "devDependencies": {
@@ -29,5 +30,10 @@
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
     "vitest": "^2.0.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.60.1",
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
+    "lightningcss-win32-x64-msvc": "^1.32.0"
   }
 }

@@ -1,6 +1,7 @@
 import React, { useId, useState } from "react";
 import type { ModelResults, HousingInputs } from "../types/housing";
 import { formatCurrency, formatPercent } from "../lib/format";
+import { RESULTS_SECTION_ID } from "../lib/sectionAnchors";
 
 interface ResultsPanelProps {
   results: ModelResults;
@@ -105,7 +106,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   };
 
   return (
-    <div className="results-panel" id="results">
+    <div className="results-panel" id={RESULTS_SECTION_ID}>
       <div className="results-hero-section">
         <div className="hero-premium">
           {isOwningCheaper ? (
@@ -174,6 +175,11 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           />
 
           <h4 className="breakdown-subheading">Equity (not a cost)</h4>
+          <p className="breakdown-hint">
+            Principal paydown isn’t its own field: it’s implied by the standard payment from home price, down payment,
+            mortgage rate, and term under <strong>Your numbers</strong>. The split shown is for the{" "}
+            <strong>first month</strong> on the starting loan balance (principal grows each month after that).
+          </p>
           <DetailRow
             label="Principal paydown (builds equity, not a cost)"
             value={formatCurrency(monthly.principal)}
@@ -191,7 +197,8 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <p className="detail-note">
           Living costs are what you pay to occupy the home. Principal turns cash into home equity—it’s not a cost of
           living in the home. Paying down principal is similar to earning your mortgage rate on that money, but it
-          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month.
+          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month,
+          including the full mortgage payment.
         </p>
       </CollapsibleResultSection>
 

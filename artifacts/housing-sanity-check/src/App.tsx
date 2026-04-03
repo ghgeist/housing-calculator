@@ -1,11 +1,13 @@
 import { lazy, Suspense, useState, useMemo } from "react";
 import { InputsPanel } from "@/components/InputsPanel";
+import { MobileQuickJump } from "@/components/MobileQuickJump";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_INPUTS } from "@/lib/defaults";
 import { runModel } from "@/lib/housing/model";
 import type { HousingInputs } from "@/types/housing";
 import "./app.css";
+import "./app-responsive.css";
 
 const ComparisonChart = lazy(() =>
   import("@/components/ComparisonChart").then((m) => ({ default: m.ComparisonChart })),
@@ -44,6 +46,7 @@ function App() {
       </header>
 
       <main className="app-main">
+        <MobileQuickJump />
         <div className="layout-grid">
           <aside className="layout-inputs">
             <InputsPanel
