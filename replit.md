@@ -16,6 +16,27 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### Housing Sanity Check (`artifacts/housing-sanity-check`)
+- React + TypeScript client-side-only app
+- Own vs. Rent decision clarity tool — models a primary residence as a leveraged consumption system
+- No backend required; all computation runs in the browser
+- Key files:
+  - `src/lib/model.ts` — pure math: mortgage amortization, carry analysis, own vs rent+invest comparison
+  - `src/lib/types.ts` — shared TypeScript types
+  - `src/lib/defaults.ts` — default inputs and preset scenarios
+  - `src/lib/format.ts` — currency/percent formatting utilities
+  - `src/components/InputsPanel.tsx` — all user inputs with tooltips and preset buttons
+  - `src/components/ResultsPanel.tsx` — hero metric, carry badge, breakdown detail
+  - `src/components/ComparisonChart.tsx` — recharts line chart for own vs rent+invest over time
+  - `src/app.css` — custom CSS (calm, analytical design, warm off-white palette)
+- Preview path: `/`
+
+### API Server (`artifacts/api-server`)
+- Express 5 server
+- Preview path: `/api`
+
 ## Key Commands
 
 - `pnpm run typecheck` — full typecheck across all packages

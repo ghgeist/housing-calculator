@@ -1,0 +1,299 @@
+# Replit AI Agent Prompt
+
+Build a small shareable web app called **Housing Sanity Check** using **React + TypeScript**.
+
+## Goal
+
+Create a decision tool that helps users compare **owning vs renting** by modeling a primary residence as a **leveraged consumption system** rather than a default investment.
+
+The app should make one core question easy to answer:
+
+> **Am I overpaying to own this house relative to renting an equivalent place?**
+
+This is not a generic mortgage calculator. It is a **sanity-check lens**.
+
+---
+
+## Product requirements
+
+The app should:
+
+1. Let the user enter the main housing assumptions.
+2. Compute the **true monthly cost of ownership**.
+3. Compute the **monthly ownership premium vs rent**.
+4. Classify the property as **Positive Carry**, **Near Neutral**, or **Negative Carry**.
+5. Compare **Own vs Rent + Invest** over a user-defined holding period.
+6. Present the output in a way that is intuitive for non-technical users.
+
+The app should feel more like a **decision clarity tool** than a finance spreadsheet.
+
+---
+
+## Technical requirements
+
+* Use **React + TypeScript**.
+* Use a **client-side only** architecture. No backend is needed.
+* Keep the core math in a separate pure-function module such as `src/lib/model.ts`.
+* Keep the UI modular and simple.
+* Use clean responsive styling. Tailwind is fine if easy, but do not overbuild styling.
+* Make the project easy to run and easy to deploy/share from Replit.
+
+---
+
+## Suggested file structure
+
+```text
+src/
+  components/
+    InputsPanel.tsx
+    ResultsPanel.tsx
+    ComparisonChart.tsx
+  lib/
+    model.ts
+    format.ts
+    types.ts
+  App.tsx
+```
+
+---
+
+## Core inputs
+
+Include these user inputs:
+
+* Home price
+* Down payment percent
+* Mortgage rate
+* Mortgage term in years
+* Property tax rate
+* Maintenance rate
+* Annual insurance
+* Equivalent monthly rent
+* Rent growth rate
+* Home appreciation rate
+* Selling cost percent
+* Investment return rate
+* Holding period in years
+
+Use sensible default values so the app is immediately useful on first load.
+
+---
+
+## Core outputs
+
+The app must clearly show:
+
+### 1. Monthly P&I
+
+Standard mortgage monthly payment.
+
+### 2. True monthly ownership cost
+
+This should emphasize:
+
+* interest
+* property taxes
+* maintenance
+* insurance
+
+Do **not** treat principal paydown as a true economic cost in this metric.
+
+### 3. Monthly premium vs rent
+
+Show:
+
+* `true ownership cost - equivalent rent`
+
+Use plain language such as:
+
+* “You are paying $X/month more to own”
+* or “Owning is $X/month cheaper than renting”
+
+### 4. Yield / carry classification
+
+Compute a simplified carry spread and classify the property:
+
+* **Positive Carry**
+* **Near Neutral**
+* **Negative Carry**
+
+### 5. Own vs Rent + Invest comparison
+
+Model two paths over the holding period:
+
+* **Own**: user pays ownership cashflows, builds equity, then sells with selling costs at the end.
+* **Rent + Invest**: user rents equivalent housing and invests the upfront capital plus any annual ownership-cost savings.
+
+Show the comparison numerically and with a simple line chart.
+
+---
+
+## Modeling guidance
+
+Use a clean deterministic model.
+
+### A. Monthly mortgage payment
+
+Use standard amortization.
+
+### B. True ownership cost
+
+Approximate or calculate directly as:
+
+* mortgage interest
+* taxes
+* maintenance
+* insurance
+
+Principal paydown is equity conversion, not consumption.
+
+### C. Carry / yield spread
+
+A useful high-level decision metric is:
+
+```text
+rent yield - financing/carry drag
+```
+
+One reasonable implementation is:
+
+```text
+Delta = (annual imputed rent / home price)
+        - [mortgage_rate * LTV + tax_rate + maintenance_rate + insurance_rate]
+```
+
+Where:
+
+* `insurance_rate = annual_insurance / home_price`
+* `LTV = loan_amount / home_price`
+
+Interpretation:
+
+* Delta > small positive threshold => Positive Carry
+* Delta around zero => Near Neutral
+* Delta materially below zero => Negative Carry
+
+### D. Own vs Rent + Invest
+
+For each year in the holding period:
+
+1. Compute remaining mortgage balance.
+2. Estimate home value using appreciation.
+3. Estimate sale proceeds net of selling costs.
+4. Compute owner net cost:
+
+   * down payment
+   * mortgage payments
+   * taxes
+   * maintenance
+   * insurance
+   * minus net sale proceeds
+5. Compute renter path:
+
+   * cumulative rent paid
+   * portfolio value from invested down payment
+   * plus invested annual housing-cost savings, if renting is cheaper
+6. Compare owner net cost vs renter net cost over time.
+
+Avoid false precision. A transparent approximation is better than an opaque model.
+
+---
+
+## UX guidance
+
+Prioritize immediate clarity.
+
+The user should understand the result within a few seconds.
+
+### Good landing hierarchy
+
+1. Big headline metric:
+
+   * monthly premium vs rent
+2. Carry status badge:
+
+   * Positive / Neutral / Negative
+3. Short explanation in plain English
+4. Comparison chart over time
+5. Expandable detail if needed
+
+Use copy that is understandable by a smart non-specialist.
+
+Avoid jargon-heavy explanations unless tucked into a secondary section.
+
+---
+
+## Design tone
+
+The interface should feel:
+
+* clean
+* calm
+* analytical
+* trustworthy
+* not salesy
+* not crypto-finance-y
+
+Avoid clutter.
+Use card-based layout and strong spacing.
+Keep it legible on desktop first, but responsive on mobile.
+
+---
+
+## Important conceptual framing
+
+This app should reflect the following core insight:
+
+> A primary residence is often better understood as a **leveraged consumption system** rather than a pure investment asset.
+
+The point is not to tell people never to buy.
+The point is to make the hidden tradeoff visible.
+
+The model should help users see when they are:
+
+* buying at roughly neutral economics,
+* paying a modest premium for stability,
+* or taking on clearly negative carry.
+
+---
+
+## Nice-to-have features if easy
+
+Only add these if they are easy and do not delay the MVP:
+
+* Preset scenarios such as:
+
+  * Low-rate regime
+  * Current regime
+  * Price correction scenario
+* Reset-to-default button
+* Tooltip definitions for terms like LTV, carry, and imputed rent
+* A short “How to read this” section
+
+---
+
+## Do not do these in v1
+
+* No backend
+* No login
+* No database
+* No account system
+* No giant settings panel
+* No tax-deduction complexity
+* No overengineered UI library work
+* No enterprise-grade architecture
+
+Keep v1 small, sharp, and shareable.
+
+---
+
+## Deliverable
+
+Produce a working React + TypeScript app in Replit that:
+
+* runs cleanly,
+* has sane defaults,
+* explains the outputs clearly,
+* and makes the own-vs-rent tradeoff visually legible.
+
+If you need to choose between mathematical completeness and interpretability, prefer **interpretability**.
