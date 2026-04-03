@@ -977,6 +977,16 @@ body {
   margin: 0 0 14px;
 }
 
+.framing-note p.framing-lead {
+  color: var(--text-primary);
+}
+
+.framing-note p.framing-guardrail {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
 .framing-bullets {
   font-size: 14px;
   color: var(--text-secondary);

@@ -61,6 +61,14 @@ function App() {
 
             <div className="framing-note">
               <h3 className="framing-title">What you&apos;re looking at</h3>
+              <p className="framing-lead">
+                This tool separates what you pay to live in a home from what builds equity. It is meant to make the{" "}
+                <strong>structure</strong> of housing decisions clearer, not to predict the future.
+              </p>
+              <p className="framing-guardrail">
+                Income tax is not modeled (for example, mortgage interest deductions). Most households take the
+                standard deduction.
+              </p>
               <ul className="framing-bullets">
                 <li>
                   <strong>Monthly reality</strong> compares what it really costs to live in the home (interest, taxes,
@@ -72,10 +80,6 @@ function App() {
                 </li>
                 <li>
                   <strong>Results</strong> depend heavily on your rent assumption and the other inputs you choose.
-                </li>
-                <li>
-                  This is a <strong>structure model</strong> for comparing scenarios, not a prediction of market
-                  outcomes.
                 </li>
               </ul>
               <details className="framing-methodology">

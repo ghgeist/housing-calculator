@@ -190,7 +190,8 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         </div>
         <p className="detail-note">
           Living costs are what you pay to occupy the home. Principal turns cash into home equity—it’s not a cost of
-          living in the home. Total owner cash outflow is everything that left your account this month.
+          living in the home. Paying down principal is similar to earning your mortgage rate on that money, but it
+          reduces liquidity and flexibility. Total owner cash outflow is everything that left your account this month.
         </p>
       </CollapsibleResultSection>
 

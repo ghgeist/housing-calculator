@@ -40,6 +40,34 @@ This document records qualitative product feedback on the housing calculator (as
 
 ---
 
+## Resolution summary (as of 2026-04-03)
+
+Follow-through in `artifacts/housing-sanity-check` against this document: most **trust and clarity** items are **implemented**. The numbered sections below stay as the original feedback record; this block is the **pickup map**.
+
+| Area | Status | Notes |
+| ---- | ------ | ----- |
+| §1 Comparable rent | **Done** | Guidance under the rent field; **sanity line** (annual rent as % of home price) in `InputsPanel.tsx`. |
+| §2 Invest the surplus | **Done** | `investMonthlySavings` on `HousingInputs`; chart subtitles + methodology copy; behavior in `calcYearlyComparison` with tests. |
+| §3 Carry vs cash flow | **Done** | Carry blurbs, **Owner cash outflow** vs true cost, methodology `<details>`, advanced carry note. |
+| §4 Monte Carlo | **Deferred** | Framed as future / tradeoff; no feature. |
+| §5 Money back / lifetime interest | **Partial** | **Money back at exit** section (cumulative cash in, net proceeds, net owner cost) + illiquidity note. No dedicated **lifetime total interest** line yet. |
+| §6 Discoverability | **Done** | Header cue, Step 1 intro, **Core scenario** open by default, presets, `#inputs-start` / jump link. |
+| §7 HOA / condos | **Done** | Field + helper copy (**condos/townhomes**); not the exact “mandatory for condos” wording. |
+| §8 P&I presentation | **Done** | **Mortgage payment (P&I)** line after equity block; interest still under living costs. |
+| §9 Tax / insurance / HOA inputs | **Done** | Fields, tooltips, **tax & maintenance base** control. |
+| §10 Metro appreciation / redeploy | **Deferred** | Roadmap / data; partial illiquidity copy at exit. |
+| §11 Income tax / standard deduction | **Done** | Visible guardrail in **What you’re looking at** (`App.tsx`): taxes not modeled; most take standard deduction. |
+| §12 Many knobs | **Partial** | Named **presets**; no outcome bands. |
+| §13 Peer / amortization education | **Open** | Optional copy or link-out only. |
+| §14 Owner-equivalent rent | **Skipped (deliberate)** | **Comparable rent** framing is enough; OER named in public docs would add a new concept for marginal gain. |
+| §15 Prepay vs mortgage rate | **Done** | One sentence in **Monthly breakdown** note (`ResultsPanel.tsx`): similar to earning the rate, **liquidity/flexibility** caveat. |
+
+**Positioning copy (same pass):** Lead paragraph under **What you’re looking at** states the tool’s **stance**—living cost vs equity, structure not prediction (`App.tsx`).
+
+**Repo docs:** `docs/README.md` indexes this file, roadmap, and memo for contributors.
+
+---
+
 ## 1. Comparable rent and strawman risk
 
 **Observation:** Outputs are only as good as the **equivalent monthly rent** input. A rent that understates what a truly comparable property would cost biases conclusions against owning.
@@ -58,14 +86,14 @@ This document records qualitative product feedback on the housing calculator (as
 
 **Observation:** If owning costs materially more than rent in **cash-out terms**, the renter could invest the difference—but real people may spend it, hold cash, or invest at a different return.
 
-**Current behavior:** In `calcYearlyComparison` (`artifacts/housing-sanity-check/src/lib/housing/model.ts`), when annual owner cash outflows exceed annual rent, the model adds that surplus to the renter’s portfolio and compounds it at `investmentReturnRate`. There is no toggle; full discipline is assumed whenever the surplus is positive.
+**Current behavior:** In `calcYearlyComparison` (`artifacts/housing-sanity-check/src/lib/housing/model.ts`), when `investMonthlySavings` is true and annual owner cash outflows exceed annual rent, the model adds that surplus to the renter’s portfolio and compounds it at `investmentReturnRate`. When the flag is false, **upfront** capital still follows the rent+invest path, but **monthly** surplus is not auto-invested. Chart copy and the methodology block in `App.tsx` reflect the toggle.
 
 **Note on definitions:** Headline **true monthly cost** excludes principal (consumption vs. equity). The **own vs rent + invest** simulation uses **full P&I plus taxes, maintenance, and insurance** as owner cash outflows—appropriate for “money that could otherwise be invested.”
 
-**Possible directions:**
+**Possible directions (mostly addressed):**
 
 - **Transparency:** Footnote on the comparison chart (`artifacts/housing-sanity-check/src/components/ComparisonChart.tsx`) stating that surplus cash vs. the owner payment path is assumed invested at the configured return.
-- **Optional input:** A boolean (e.g. “Invest monthly savings”) defaulting to on, matching today’s behavior; when off, do not add surplus to the portfolio (or grow it at 0% / a separate cash rate).
+- **Optional input:** A boolean (e.g. “Invest monthly savings”) defaulting to on, matching earlier behavior; when off, do not add surplus to the portfolio—**shipped** as `investMonthlySavings`.
 
 ---
 
@@ -242,3 +270,4 @@ Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over h
 - **2026-04-03** — Initial external review notes; expanded same day with Monte Carlo vs deterministic discussion and long-horizon “money back” / total interest / housing as asset and consumption (conversation synthesized for the repo).
 - **2026-04-03** — Added second-round notes: input discoverability, condo/HOA sensitivity, P&I presentation, appreciation/illiquidity, standard deduction, parameter ranges, peer comparison anecdotes, external rent-vs-own narratives, and owner-equivalent rent (including a user-supplied video link).
 - **2026-04-03** — Added note on **prepayment vs mortgage-rate** mental model, opportunity cost, and validation of scenario-style tools despite many coupled variables (third-party media mentioned only generically in the doc body).
+- **2026-04-03** — **Resolution summary** table (pickup map vs §1–§15). Updated §2 **Current behavior** for `investMonthlySavings`. Logged shipped copy: model stance + tax guardrail (`App.tsx`), prepayment line (`ResultsPanel.tsx`), deliberate **skip** of OER in UI, and `docs/README.md` index.

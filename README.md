@@ -11,7 +11,7 @@ This app is intentionally **not** a generic mortgage calculator. It focuses on d
 ## Why this differs from a generic mortgage calculator
 
 Generic calculators often emphasize total payment and equity growth without clearly separating:
-- **consumed housing cost** (interest, tax, maintenance, insurance), vs
+- **consumed housing cost** (interest, tax, maintenance, insurance, HOA), vs
 - **equity conversion** (principal paydown).
 
 This tool keeps that distinction explicit so users can answer:
@@ -24,10 +24,11 @@ This tool keeps that distinction explicit so users can answer:
   - property tax
   - maintenance reserve
   - insurance
+  - HOA dues (monthly)
 - **Principal paydown is excluded** from true monthly ownership cost.
 - Carry analysis uses:
   - imputed rent yield = annual rent / home price
-  - carry drag = mortgage rate × LTV + tax rate + maintenance rate + insurance rate
+  - carry drag = mortgage rate × LTV + tax rate + maintenance rate + (annual insurance ÷ home price) + (annual HOA ÷ home price)
 - Own vs Rent + Invest compares cumulative net cost over the selected holding period.
 - Yearly property tax and maintenance can be modeled on either purchase price (default) or current appreciated value.
 
@@ -40,6 +41,8 @@ Key folders:
 - `src/lib/housing/` pure housing model functions
 - `src/lib/` app utilities/default values
 - `src/types/` domain types
+- `src/hooks/` shared hooks
+- `src/pages/` routed pages
 
 ## Run locally
 
@@ -67,7 +70,7 @@ pnpm --filter @workspace/housing-sanity-check run build
 
 ## Tests and lint
 
-From repo root (runs Vitest for the whole workspace):
+From repo root (runs every test file matched by root Vitest config: `artifacts/**`, `lib/**`, `scripts/**`):
 
 ```bash
 pnpm test:run
