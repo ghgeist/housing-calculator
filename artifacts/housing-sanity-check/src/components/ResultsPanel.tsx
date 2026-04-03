@@ -51,30 +51,31 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   const { monthly, premiumVsRent, carry, ltv } = results;
   const isOwningCheaper = premiumVsRent < 0;
   const premiumAbs = Math.abs(premiumVsRent);
+  const finalYear = results.yearlyComparison.at(-1);
 
   const carryExplanation: Record<string, string> = {
-    "Positive Carry": `At these numbers, implied rent (from what you entered) roughly covers financing and ownership drag. Owning is not much of a monthly drain.`,
-    "Near Neutral": `Roughly balanced. You pay a bit more to own than implied rent here, but not wildly.`,
-    "Negative Carry": `Owning costs noticeably more each month than implied rent here. You are paying a real premium to own (which might still be worth it for other reasons).`,
+    "Positive Carry": `At these numbers, implied rent yield more than covers modeled financing and ownership drag. This is a spread view, not a household cash-flow statement.`,
+    "Near Neutral": `The spread is roughly balanced. Implied rent yield and ownership drag are close to even here.`,
+    "Negative Carry": `Negative Carry here means implied rent yield is below modeled ownership drag. It is a spread metric, not a claim that your household free cash flow is negative.`,
   };
 
   return (
     <div className="results-panel" id="results">
       <div className="stats-grid">
         <StatCard
-          label="Mortgage payment"
-          value={formatCurrency(monthly.principalAndInterest)}
-          sub="Principal + interest (P&I)"
+          label="Owner cash outflow"
+          value={formatCurrency(monthly.totalOwnerCashOutflow)}
+          sub="Cash leaving your account each month"
         />
         <StatCard
           label="True monthly cost"
           value={formatCurrency(monthly.trueOwnershipCost)}
-          sub="Interest, taxes, upkeep, insurance"
+          sub="Consumed cost: interest, taxes, upkeep, insurance, HOA"
         />
         <StatCard
           label="Comparable rent"
           value={formatCurrency(inputs.monthlyRent)}
-          sub="What you would pay to rent instead"
+          sub="Your estimate for a comparable property"
         />
         <StatCard
           label="Down Payment"
@@ -114,16 +115,37 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           <DetailRow label="Property taxes" value={formatCurrency(monthly.propertyTax)} />
           <DetailRow label="Maintenance reserve" value={formatCurrency(monthly.maintenance)} />
           <DetailRow label="Insurance" value={formatCurrency(monthly.insurance)} />
+          <DetailRow label="HOA dues" value={formatCurrency(monthly.hoa)} />
           <div className="detail-divider" />
-          <DetailRow label="True ownership cost" value={formatCurrency(monthly.trueOwnershipCost)} />
+          <DetailRow label="True monthly ownership cost (consumed)" value={formatCurrency(monthly.trueOwnershipCost)} />
           <DetailRow label="Principal paydown (equity)" value={formatCurrency(monthly.principal)} muted />
-          <DetailRow label="Total P&I payment" value={formatCurrency(monthly.principalAndInterest)} muted />
+          <DetailRow label="Mortgage payment (P&I only)" value={formatCurrency(monthly.principalAndInterest)} muted />
+          <DetailRow label="Total owner cash outflow" value={formatCurrency(monthly.totalOwnerCashOutflow)} />
         </div>
         <p className="detail-note">
-          Principal paydown is not included in true monthly cost; it builds equity in the home, not spending like interest
-          or repairs.
+          True monthly ownership cost tracks consumed cost. Total owner cash outflow adds principal paydown because that
+          cash still leaves your account even though it becomes equity.
         </p>
       </div>
+
+      {finalYear && (
+        <div className="detail-section">
+          <h3 className="section-title">Money back at exit</h3>
+          <div className="detail-list">
+            <DetailRow
+              label={`Owner cash in over ${inputs.holdingPeriod} years`}
+              value={formatCurrency(finalYear.cumulativeOwnerCashIn, true)}
+            />
+            <DetailRow label="Estimated net sale proceeds" value={formatCurrency(finalYear.netEquity, true)} />
+            <div className="detail-divider" />
+            <DetailRow label="Modeled net owner cost over hold" value={formatCurrency(finalYear.ownerNetCost, true)} />
+          </div>
+          <p className="detail-note">
+            Cash back uses the estimated sale value after selling costs and remaining loan payoff. Home equity is
+            balance-sheet value and may be illiquid unless you sell or borrow against it.
+          </p>
+        </div>
+      )}
 
       <div className="detail-section">
         <h3 className="section-title">Carry snapshot</h3>
@@ -144,8 +166,8 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         </div>
         <p className="detail-note">
           <strong>Implied rent yield</strong> is annual rent ÷ home price. <strong>Drag</strong> adds mortgage cost (by
-          loan-to-value), taxes, maintenance, and insurance. Positive net means implied rent keeps up with those costs;
-          negative means you are carrying extra cost to own.
+          loan-to-value), taxes, maintenance, insurance, and HOA. The net line is a carry spread, not a household
+          free-cash-flow metric.
         </p>
       </div>
     </div>

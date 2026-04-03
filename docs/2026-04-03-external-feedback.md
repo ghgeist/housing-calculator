@@ -20,6 +20,24 @@ This document records qualitative product feedback on the housing calculator (as
 
 5. **Questions beyond “rent vs buy”** — One motivating thread is not the binary rent-or-own choice but **whether cumulative cash put into a house comes back** over a long hold (e.g. 30 years): total payments (especially interest—often in the ballpark of **paying for the price of the house again** on a minimum-payment 30-year loan, depending on rate) versus ending equity and sale outcomes. A home is both an **asset** and, in another sense, the **largest durable “consumption” purchase** most people make—useful tension for future copy or metrics, not necessarily a call to duplicate the large existing rent-vs-buy literature.
 
+6. **Inputs layout and discoverability** — Users may not immediately see where to enter numbers if primary controls sit **below the fold**; first impressions can feel like “nothing to type into” until they scroll.
+
+7. **Condo / HOA and borderline carry** — Meaningful **HOA** can swing the own-vs-rent story; until those fees are included, **carry** can read “barely green” for owning in a way that matches intuition once HOA is modeled.
+
+8. **How P&I is shown** — Some readers prefer **one amortized payment** mentally; breaking **principal vs interest** in the monthly breakdown can feel like extra moving parts even though both are contractually real each month.
+
+9. **Location-based appreciation** — Interest in **metro- or market-specific** appreciation defaults (e.g. trade-association or other published series), with awareness that the tool’s sale-based path assumes a **liquidating** event.
+
+10. **Illiquidity, rebuying, and the standard deduction** — **Home equity** is a real balance-sheet asset but not cash; if you still need housing and do not sell (or sell and rebuy), wealth is **embedded** in the next dwelling. **Mortgage interest deduction** is highly household-specific; assuming **standard deduction** matches many filers but should stay explicit if ever modeled.
+
+11. **Many knobs vs ranges** — High **parameter count** makes “one true number” hard; **ranges or scenarios** could help or **muddy** the story—worth weighing against sensitivity presets. Serious users are expected to **tighten inputs** themselves.
+
+12. **Term, rate, prepayment, and peer comparisons** — Short **mortgage term**, **lower rate**, **points**, **extra principal**, and **local appreciation** interact strongly; anecdotal comparisons across households are consistent with the model’s sensitivity, not a call for social features.
+
+13. **External framing** — Third-party analyses sometimes conclude **renting is cheaper** in current conditions; the **BLS “owner equivalent rent”** idea (asking owners what their home would rent for) aligns with this app’s **comparable rent** input. Reference: [YouTube — discussion touching owner-equivalent rent and housing costs](https://youtu.be/yU2raZftgmE?si=syh01uy0ZkMtiOA5).
+
+14. **Prepayment vs “earning the mortgage rate”** — It is tempting to treat **extra principal** as a risk-free “investment” that **returns exactly the mortgage rate**; in practice **opportunity cost**, **liquidity**, **taxes**, and **what else you would do with the dollar** break a simple 1:1 story (personal finance media often surfaces one of these wrinkles). That supports the broader theme—**many coupled variables**—while still validating **deterministic scenario** tools as a worthwhile way to play with the tradeoffs.
+
 ---
 
 ## 1. Comparable rent and strawman risk
@@ -92,6 +110,127 @@ This document records qualitative product feedback on the housing calculator (as
 
 ---
 
+## 6. Inputs discoverability and first-run layout
+
+**Observation:** On first load, a user looked for **numeric inputs at the top** of the page and was briefly unsure how to enter a scenario; after **scrolling**, the input panel became clear.
+
+**Possible directions:**
+
+- **Layout:** Keep critical inputs **visible without scrolling** on common laptop viewports, or add a short **above-the-fold cue** (“Adjust assumptions below”) so the page does not read as static output only.
+- **Progressive disclosure:** If the layout stays long-form, a compact **summary strip** or anchor link to “Your inputs” can reduce scroll-hunt friction.
+
+---
+
+## 7. Condos, HOA, and “barely positive” carry
+
+**Observation:** For a **condo**, **HOA** materially affects total ownership drag. Intuition: once HOA is fully reflected, the same scenario may tilt toward **renting**; until then, **carry** can look **slightly favorable to owning**.
+
+**Current behavior:** `HousingInputs` includes **`monthlyHoa`**; the monthly breakdown includes HOA in **true ownership cost** and **total cash outflow** (`artifacts/housing-sanity-check/src/types/housing.ts`, model in `src/lib/housing/model.ts`). If feedback predates a build with HOA surfaced in the UI, treat this as validation that **HOA must be easy to find and understand**, not only present in the schema.
+
+**Possible directions:**
+
+- **Copy near HOA:** One line that HOA is **mandatory for condos** for a fair comparison to rent.
+- **Defaults:** Condo-oriented presets (higher HOA, maintenance) are optional and market-dependent; see `src/lib/defaults.ts`.
+
+---
+
+## 8. Presenting principal and interest in the monthly breakdown
+
+**Observation:** From a household mental model, **P&I is one mortgage payment** that amortizes month to month; showing **interest** and **principal** as separate lines under “cost” can feel like **extra variables** even though interest is a true expense and principal is equity conversion (a distinction this repo intentionally preserves).
+
+**Current behavior:** The UI separates **interest** vs **principal** to support **true monthly cost** (consumption) vs **equity** framing per `AGENTS.md`.
+
+**Possible directions:**
+
+- **Presentation:** Add a **subtotal line** (“Mortgage payment (P&I)”) with expandable detail, or a **tooltip** that states both parts are paid monthly but only interest counts toward **consumed** cost.
+- **Scope:** Avoid blurring **principal into “cost”** in headline metrics; any consolidation should remain **visually** grouped, not mathematically merged into true monthly cost.
+
+---
+
+## 9. Insurance, property tax, and HOA as “missing” inputs (perception vs code)
+
+**Observation:** Users may ask for explicit inputs for **insurance**, **HOA**, and **property taxes**.
+
+**Current behavior:** The model already includes **`annualInsurance`**, **`monthlyHoa`**, and **`propertyTaxRate`** (rate applied to the chosen cost basis). If users still perceive gaps, the issue is likely **discoverability**, **wording** (“rate” vs dollar tax), or **ordering** of fields—not absence from the type system.
+
+**Possible directions:**
+
+- **Labels:** Clarify how tax is computed (rate × basis) and link to **assessed value** mentally.
+- **Optional advanced input:** Assessed value or annual tax dollars **instead of** rate, derived behind the scenes—only if it reduces confusion without duplicating state.
+
+---
+
+## 10. Location-based appreciation and illiquidity
+
+**Observation:** **Metro-specific** appreciation benchmarks (e.g. from trade groups or recurring market reports) would feel more grounded than a single generic default. Separately: **appreciation** in long-horizon charts often assumes a **sale**; if the user **does not sell** or **must buy again**, wealth is **illiquid** and **re-embedded** in housing—still a **transferable** asset on a balance sheet, but not spendable like cash.
+
+**Alignment:** See `docs/2026-04-03-roadmap.md` for staged **market-aware** evolution; pulling official metro series is a **data-sourcing** decision, not a one-line UI change.
+
+**Possible directions:**
+
+- **Copy:** Short note where appreciation is used: “Shown as **equity at sale**; staying housed after a sale can **redeploy** much of this into the next purchase.”
+- **Presets:** Optional metro appreciation **presets** with **source footnotes** if the project adopts external data later.
+
+---
+
+## 11. Mortgage interest deduction and standard deduction
+
+**Observation:** **Itemizing** vs **standard deduction** makes **after-tax mortgage interest** highly individual; many households **take the standard deduction**, so tax savings from ownership are often **smaller than assumed** in informal conversation.
+
+**Possible directions:**
+
+- **Explicit non-goal:** State in methodology or help text that **income tax interactions are not modeled** (or add a simple toggle only with clear docs and tests—higher scope).
+- **Copy:** One sentence that users who **do not itemize** should not mentally subtract a large **mortgage interest tax shield** from the displayed costs.
+
+---
+
+## 12. Many variables: single outcome vs ranges
+
+**Observation:** With many uncertain inputs, it is **hard to generalize** one headline number. **Ranges** or **bands** on the final comparison could help honesty or could **obscure** the core story.
+
+**Possible directions:**
+
+- **Lightweight sensitivity:** Two or three **named scenarios** (e.g. “lower appreciation / higher rent growth”) before full distributions.
+- **Principle:** Reserve **Monte Carlo** or wide bands for when the product explicitly commits to uncertainty storytelling; see §4.
+
+---
+
+## 13. Term, rate, points, prepayment, and informal peer comparison
+
+**Observation:** Quick comparisons between households (e.g. **15-year** vs **30-year**, **rate buydown with points**, **extra principal**, and **local appreciation**) show **large dispersion in equity** even when monthly payments feel similar—consistent with the model’s sensitivity to **term**, **rate**, and **appreciation**.
+
+**Possible directions:**
+
+- **Education:** Optional copy or link-out on how **amortization schedule** and **term** change **equity build** independent of “house price went up.”
+- **Avoid scope creep:** No need to model **every** peer scenario; the insight is **parameter sensitivity**.
+
+---
+
+## 14. External narratives and owner-equivalent rent
+
+**Observation:** Some public and media analyses currently emphasize **renting cheaper than owning** in aggregate or in selected markets. The **BLS** concept of **owner equivalent rent**—asking owners what their home **would rent for**—parallels this tool’s reliance on a thoughtful **comparable rent** input.
+
+**Reference:** [YouTube video touching owner-equivalent rent and housing-cost comparisons](https://youtu.be/yU2raZftgmE?si=syh01uy0ZkMtiOA5) (external; not an endorsement of every claim in the video).
+
+**Possible directions:**
+
+- **Copy:** Brief pointer to **owner equivalent rent** as a mental check for the rent field (with a neutral citation to BLS documentation if desired later).
+
+---
+
+## 15. Extra principal: “same as the mortgage rate?” (mental model)
+
+**Observation:** A user recalled believing that **paying down principal** was economically identical to **earning the mortgage interest rate** on that money—until another factor (described in passing as a common **personal-finance video** framing) showed the comparison is **not a single-variable identity**. The takeaway aligns with **high dimensionality**: almost **too many variables** for a tidy universal equation, but **modeling concrete scenarios** remains engaging and useful.
+
+**Conceptual note:** Prepaying **does** avoid future interest at the loan’s **contract rate**, which is often compared to a **guaranteed, after-tax-relevant** hurdle. The simplification breaks when you ask **versus what alternative** (portfolio return, liquidity premium, other debt, tax treatment, horizon, or probability of moving). This app’s **rent + invest** path already encodes one explicit alternative: **invest the difference** at `investmentReturnRate`—not the same as “prepay equals invest at mortgage rate” unless you deliberately equate them and accept the implicit assumptions.
+
+**Possible directions:**
+
+- **Education (light touch):** A short footnote or help line near **holding / equity** content: prepayment saves **contract interest**; comparing that to **other uses of cash** requires an assumed **alternative return** and **risk**—no need to cite third-party shows by name.
+- **Scope:** Do not turn the UI into a full **optimal prepayment** solver; optional copy is enough unless the product later targets that question directly.
+
+---
+
 ## Scope discipline
 
 Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over heavy new infrastructure. Any change to **core metric definitions** or **carry thresholds** should stay deliberate, tested, and documented.
@@ -101,3 +240,5 @@ Per `AGENTS.md`, prefer small, readable changes: copy and optional inputs over h
 ## Changelog
 
 - **2026-04-03** — Initial external review notes; expanded same day with Monte Carlo vs deterministic discussion and long-horizon “money back” / total interest / housing as asset and consumption (conversation synthesized for the repo).
+- **2026-04-03** — Added second-round notes: input discoverability, condo/HOA sensitivity, P&I presentation, appreciation/illiquidity, standard deduction, parameter ranges, peer comparison anecdotes, external rent-vs-own narratives, and owner-equivalent rent (including a user-supplied video link).
+- **2026-04-03** — Added note on **prepayment vs mortgage-rate** mental model, opportunity cost, and validation of scenario-style tools despite many coupled variables (third-party media mentioned only generically in the doc body).

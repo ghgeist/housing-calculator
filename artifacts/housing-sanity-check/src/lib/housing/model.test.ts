@@ -32,10 +32,11 @@ test("reduces to straight-line principal at zero rate", () => {
 test("computes true monthly ownership cost excluding principal paydown", () => {
   const monthly = calcMonthlyBreakdown(DEFAULT_INPUTS);
 
-  const expected = monthly.interest + monthly.propertyTax + monthly.maintenance + monthly.insurance;
+  const expected = monthly.interest + monthly.propertyTax + monthly.maintenance + monthly.insurance + monthly.hoa;
   expect(Math.abs(monthly.trueOwnershipCost - expected)).toBeLessThan(1e-8);
-  const nonMortgageCosts = monthly.propertyTax + monthly.maintenance + monthly.insurance;
+  const nonMortgageCosts = monthly.propertyTax + monthly.maintenance + monthly.insurance + monthly.hoa;
   expect(Math.abs(monthly.trueOwnershipCost + monthly.principal - (monthly.principalAndInterest + nonMortgageCosts))).toBeLessThan(1e-8);
+  expect(Math.abs(monthly.totalOwnerCashOutflow - (monthly.principalAndInterest + nonMortgageCosts))).toBeLessThan(1e-8);
 });
 
 test("classifies carry using documented thresholds", () => {
@@ -112,4 +113,76 @@ test("returns coherent yearly comparison outputs", () => {
   expect(final).toBeDefined();
   expect(final!.homeValue).toBeGreaterThan(DEFAULT_INPUTS.homePrice);
   expect(final!.remainingBalance).toBeLessThan(result.loanAmount);
+  expect(final!.cumulativeOwnerCashIn).toBeGreaterThan(DEFAULT_INPUTS.homePrice * (DEFAULT_INPUTS.downPaymentPct / 100));
+});
+
+test("includes HOA in ownership cost and carry drag", () => {
+  const withoutHoa = runModel({
+    ...DEFAULT_INPUTS,
+    monthlyHoa: 0,
+  });
+  const withHoa = runModel({
+    ...DEFAULT_INPUTS,
+    monthlyHoa: 450,
+  });
+
+  expect(withHoa.monthly.hoa).toBe(450);
+  expect(withHoa.monthly.trueOwnershipCost - withoutHoa.monthly.trueOwnershipCost).toBe(450);
+  expect(withHoa.monthly.totalOwnerCashOutflow - withoutHoa.monthly.totalOwnerCashOutflow).toBe(450);
+  expect(withHoa.carry.carryDrag).toBeGreaterThan(withoutHoa.carry.carryDrag);
+});
+
+test("disabling monthly savings investing keeps owner outputs unchanged and still invests upfront capital", () => {
+  const baseInputs = {
+    ...DEFAULT_INPUTS,
+    homePrice: 100,
+    downPaymentPct: 20,
+    mortgageRate: 0,
+    mortgageTerm: 30,
+    propertyTaxRate: 0,
+    maintenanceRate: 0,
+    annualInsurance: 0,
+    monthlyHoa: 0,
+    monthlyRent: 0,
+    rentGrowthRate: 0,
+    appreciationRate: 0,
+    sellingCostPct: 0,
+    investmentReturnRate: 10,
+    holdingPeriod: 1,
+  };
+
+  const withSavingsInvested = calcYearlyComparison({
+    ...baseInputs,
+    investMonthlySavings: true,
+  });
+  const withoutSavingsInvested = calcYearlyComparison({
+    ...baseInputs,
+    investMonthlySavings: false,
+  });
+
+  expect(withoutSavingsInvested[0].ownerNetCost).toBeCloseTo(withSavingsInvested[0].ownerNetCost, 8);
+  expect(withoutSavingsInvested[0].cumulativeOwnerCashIn).toBeCloseTo(withSavingsInvested[0].cumulativeOwnerCashIn, 8);
+  expect(withoutSavingsInvested[0].renterPortfolio).toBeCloseTo(22, 8);
+  expect(withSavingsInvested[0].renterPortfolio).toBeGreaterThan(withoutSavingsInvested[0].renterPortfolio);
+});
+
+test("surfaces cumulative owner cash in for the selected hold period", () => {
+  const inputs = {
+    ...DEFAULT_INPUTS,
+    homePrice: 240_000,
+    downPaymentPct: 25,
+    mortgageRate: 0,
+    mortgageTerm: 30,
+    propertyTaxRate: 1,
+    maintenanceRate: 1,
+    annualInsurance: 1_200,
+    monthlyHoa: 250,
+    holdingPeriod: 1,
+  };
+
+  const monthly = calcMonthlyBreakdown(inputs);
+  const yearly = calcYearlyComparison(inputs);
+  const expected = inputs.homePrice * 0.25 + monthly.totalOwnerCashOutflow * 12;
+
+  expect(yearly[0].cumulativeOwnerCashIn).toBeCloseTo(expected, 8);
 });

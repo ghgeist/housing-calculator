@@ -2,13 +2,15 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import type { ReactNode } from "react";
 import type { HousingInputs, PropertyCostBasis } from "@/types/housing";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatPercent } from "@/lib/format";
 import { commitNumberFromDraft, committedNumberDisplay } from "@/lib/numberInputCommit";
 import { housingInputsEqual } from "@/lib/housingInputsEqual";
 
 interface InputsPanelProps {
   inputs: HousingInputs;
+  impliedRentYield: number;
   onChange: (inputs: HousingInputs) => void;
 }
 
@@ -121,8 +123,12 @@ function NumberInput({
   );
 }
 
-export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
+export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelProps) {
   function update(key: keyof HousingInputs, value: number) {
+    onChange({ ...inputs, [key]: value });
+  }
+
+  function updateBoolean(key: keyof HousingInputs, value: boolean) {
     onChange({ ...inputs, [key]: value });
   }
 
@@ -147,12 +153,20 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
   const loanAmount = inputs.homePrice - downPaymentAmount;
 
   return (
-    <div className="inputs-panel">
+    <div className="inputs-panel" id="inputs-start">
       <div className="panel-header">
         <h2 className="panel-title">Your numbers</h2>
         <button className="reset-btn" onClick={reset} type="button">
           Reset to defaults
         </button>
+      </div>
+
+      <div className="panel-intro">
+        <div className="panel-intro-title">Start here</div>
+        <div className="panel-intro-copy">
+          Enter the home price, down payment, and comparable rent first. If you want more specificity, add taxes,
+          insurance, HOA, and appreciation assumptions below.
+        </div>
       </div>
 
       <div className="presets-row">
@@ -266,6 +280,20 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
             min={0}
           />
         </Field>
+        <Field
+          fieldId="monthlyHoa"
+          label="Monthly HOA"
+          tooltip="Monthly HOA or condo association dues. Leave at 0 if not applicable."
+        >
+          <NumberInput
+            id="monthlyHoa"
+            value={inputs.monthlyHoa}
+            onChange={(v) => update("monthlyHoa", v)}
+            prefix="$"
+            step={25}
+            min={0}
+          />
+        </Field>
 
         <Field
           fieldId="propertyCostBasis"
@@ -301,14 +329,22 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
           label="Equivalent monthly rent"
           tooltip="What would you pay to rent a comparable home? This is the key comparison point."
         >
-          <NumberInput
-            id="monthlyRent"
-            value={inputs.monthlyRent}
-            onChange={(v) => update("monthlyRent", v)}
-            prefix="$"
-            step={100}
-            min={0}
-          />
+          <div className="field-with-note">
+            <NumberInput
+              id="monthlyRent"
+              value={inputs.monthlyRent}
+              onChange={(v) => update("monthlyRent", v)}
+              prefix="$"
+              step={100}
+              min={0}
+            />
+            <span className="field-note">
+              Use the rent for a truly comparable property: similar size, quality, and location.
+            </span>
+            <span className="field-note">
+              Sanity check: annual rent is {formatPercent(impliedRentYield * 100)} of the home price.
+            </span>
+          </div>
         </Field>
         <Field
           fieldId="rentGrowthRate"
@@ -333,8 +369,8 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
         <div className="inputs-disclosure-body">
           <Field
             fieldId="appreciationRate"
-            label="Home appreciation rate"
-            tooltip="Expected annual increase in home value. Long-run US average is roughly 3–4%, but varies widely by market."
+            label="Home appreciation assumption"
+            tooltip="Expected annual increase in home value. This is an assumption, not a market data feed; long-run averages vary a lot by location."
           >
             <NumberInput
               id="appreciationRate"
@@ -372,6 +408,28 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
               step={0.25}
               min={0}
             />
+          </Field>
+          <Field
+            fieldId="investMonthlySavings"
+            label="Invest monthly savings"
+            connectLabelToControl={false}
+            tooltip="When on, any gap where renting costs less than the owner cash outflow is added to the renter portfolio. The avoided down payment stays invested either way."
+          >
+            <div className="toggle-control">
+              <div className="toggle-copy">
+                <span className="toggle-title">Invest monthly savings</span>
+                <span className="field-note">
+                  Turns the renter surplus assumption on or off. Upfront down-payment capital remains invested either
+                  way.
+                </span>
+              </div>
+              <Switch
+                id="investMonthlySavings"
+                checked={inputs.investMonthlySavings}
+                onCheckedChange={(checked) => updateBoolean("investMonthlySavings", checked)}
+                aria-label="Invest monthly savings"
+              />
+            </div>
           </Field>
           <Field fieldId="holdingPeriod" label="Holding period">
             <NumberInput
