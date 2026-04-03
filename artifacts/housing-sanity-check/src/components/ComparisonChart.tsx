@@ -56,9 +56,9 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
   return (
     <div className="comparison-chart">
       <div className="chart-header">
-        <h3 className="section-title">Own vs Rent + Invest over time</h3>
+        <h3 className="section-title">Owning vs renting + investing</h3>
         <p className="chart-subtitle">
-          Net cost to each path after {data.length} years. Lower is better — the cheaper path wins.
+          Total net cost of each path over the years you entered. Lower is cheaper.
         </p>
       </div>
 
@@ -66,16 +66,20 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
         <div className="chart-summary">
           {ownerWins ? (
             <span className="chart-summary-win">
-              Owning saves {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} net over {data.length} years
+              In this run, owning is about{" "}
+              {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
+              {data.length} years
             </span>
           ) : (
             <span className="chart-summary-lose">
-              Renting + investing saves {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} net over {data.length} years
+              In this run, renting + investing is about{" "}
+              {formatCurrency(Math.abs(finalYear.ownerNetCost - finalYear.renterNetCost), true)} cheaper net over{" "}
+              {data.length} years
             </span>
           )}
           {breakEvenYear && (
             <span className="chart-breakeven">
-              · Paths cross around year {breakEvenYear.year}
+              · Lines cross around year {breakEvenYear.year}
             </span>
           )}
         </div>
@@ -131,8 +135,8 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
       </ResponsiveContainer>
 
       <div className="chart-wealth-section">
-        <h4 className="chart-wealth-title">Wealth accumulation</h4>
-        <p className="chart-subtitle">Home equity vs renter portfolio value. Neither includes money out-of-pocket.</p>
+        <h4 className="chart-wealth-title">Where the money ends up</h4>
+        <p className="chart-subtitle">Home equity vs what the renter’s investments grew to — paper wealth, not cash in hand.</p>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />

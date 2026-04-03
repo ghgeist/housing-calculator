@@ -53,9 +53,9 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
   const premiumAbs = Math.abs(premiumVsRent);
 
   const carryExplanation: Record<string, string> = {
-    "Positive Carry": `At these prices and rates, the rental yield on this home more than covers your financing costs. You're not giving up much to own — owning is close to neutral or even favorable on a cash-flow basis.`,
-    "Near Neutral": `The economics are roughly balanced. You're paying a modest premium for the stability and optionality of ownership, but it's not dramatically inefficient.`,
-    "Negative Carry": `This home has meaningfully negative carry — your financing costs and holding expenses significantly exceed the implied rental yield. You're paying a real premium for ownership beyond just the convenience.`,
+    "Positive Carry": `At these numbers, the rent you’d expect for this home roughly covers your mortgage-heavy costs — owning isn’t much of a monthly drain.`,
+    "Near Neutral": `Roughly balanced. You pay a bit more to own than the rent implied here, but not wildly.`,
+    "Negative Carry": `Owning costs noticeably more than the rent implied here each month — you’re paying a real premium to own (which might still be worth it for other reasons).`,
   };
 
   return (
@@ -80,19 +80,19 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
 
       <div className="stats-grid">
         <StatCard
-          label="Monthly P&I"
+          label="Mortgage payment"
           value={formatCurrency(monthly.principalAndInterest)}
-          sub="Principal + Interest"
+          sub="Principal + interest (P&I)"
         />
         <StatCard
-          label="True Monthly Cost"
+          label="True monthly cost"
           value={formatCurrency(monthly.trueOwnershipCost)}
-          sub="Interest + tax + maintenance + insurance"
+          sub="Interest, taxes, upkeep, insurance"
         />
         <StatCard
-          label="Equivalent Rent"
+          label="Comparable rent"
           value={formatCurrency(inputs.monthlyRent)}
-          sub="Your comparison baseline"
+          sub="What you’d pay to rent instead"
         />
         <StatCard
           label="Down Payment"
@@ -114,29 +114,32 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           <DetailRow label="Total P&I payment" value={formatCurrency(monthly.principalAndInterest)} muted />
         </div>
         <p className="detail-note">
-          Principal paydown is excluded from the true ownership cost because it converts cash to home equity, not to consumption.
+          Principal paydown isn’t included in true monthly cost — it builds equity in the home, not “spending” like interest
+          or repairs.
         </p>
       </div>
 
       <div className="detail-section">
-        <h3 className="section-title">Carry analysis</h3>
+        <h3 className="section-title">Carry snapshot</h3>
         <div className="detail-list">
           <DetailRow
-            label="Imputed rent yield"
+            label="Rent vs price (yield)"
             value={formatPercent(carry.imputedRentYield * 100)}
           />
           <DetailRow
-            label="Financing & carry drag"
+            label="Financing + ownership drag"
             value={formatPercent(carry.carryDrag * 100)}
           />
           <div className="detail-divider" />
           <DetailRow
-            label="Net carry delta"
+            label="Net (yield − drag)"
             value={`${carry.delta >= 0 ? "+" : ""}${formatPercent(carry.delta * 100)}`}
           />
         </div>
         <p className="detail-note">
-          Imputed rent yield = annual rent / home price. Carry drag = mortgage rate × LTV + tax rate + maintenance rate + insurance rate. A positive delta means renting implies the home is fairly priced; negative means you're carrying a cost premium.
+          Rent yield is annual rent ÷ home price. Drag adds mortgage cost (by loan-to-value), taxes, maintenance, and
+          insurance. Positive net means the implied rent keeps up with those costs; negative means you’re carrying extra
+          cost to own.
         </p>
       </div>
     </div>

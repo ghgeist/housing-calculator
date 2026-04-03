@@ -98,7 +98,7 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
   return (
     <div className="inputs-panel">
       <div className="panel-header">
-        <h2 className="panel-title">Assumptions</h2>
+        <h2 className="panel-title">Your numbers</h2>
         <button className="reset-btn" onClick={reset} type="button">
           Reset to defaults
         </button>
@@ -120,7 +120,7 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
       </div>
 
       <div className="inputs-section">
-        <h3 className="section-title">The Home</h3>
+        <h3 className="section-title">The place</h3>
         <Field
           label="Home price"
           tooltip="The purchase price of the home you are considering."
@@ -228,7 +228,7 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
       </div>
 
       <div className="inputs-section">
-        <h3 className="section-title">The Alternative</h3>
+        <h3 className="section-title">Or renting</h3>
         <Field
           label="Equivalent monthly rent"
           tooltip="What would you pay to rent a comparable home? This is the key comparison point."
@@ -256,7 +256,7 @@ export function InputsPanel({ inputs, onChange }: InputsPanelProps) {
       </div>
 
       <div className="inputs-section">
-        <h3 className="section-title">Growth Assumptions</h3>
+        <h3 className="section-title">Growth & timeline</h3>
         <Field
           label="Home appreciation rate"
           tooltip="Expected annual increase in home value. Long-run US average is roughly 3–4%, but varies widely by market."
