@@ -108,6 +108,29 @@ body {
 .layout-inputs {
   position: sticky;
   top: 24px;
+  align-self: start;
+  min-height: 0;
+  /* One outer scroll: fits viewport minus slack (sticky inset + bottom breathing room + safe area) */
+  max-height: calc(100vh - 48px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 48px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.layout-inputs::-webkit-scrollbar {
+  width: 8px;
+}
+
+.layout-inputs::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.layout-inputs::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .layout-results {
@@ -1056,6 +1079,10 @@ body {
   .layout-inputs {
     position: static;
     order: 1;
+    max-height: none;
+    overflow-x: visible;
+    overflow-y: visible;
+    scrollbar-gutter: auto;
   }
 
   .layout-results {

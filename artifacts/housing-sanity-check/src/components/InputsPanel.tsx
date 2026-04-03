@@ -276,7 +276,7 @@ export function InputsPanel({ inputs, impliedRentYield, onChange }: InputsPanelP
         </div>
       </details>
 
-      <details className="inputs-disclosure inputs-section" open>
+      <details className="inputs-disclosure inputs-section">
         <summary className="inputs-disclosure-summary">
           <span className="section-title">Financing &amp; property costs</span>
         </summary>
