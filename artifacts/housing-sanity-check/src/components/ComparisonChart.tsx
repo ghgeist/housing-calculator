@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
-import type { YearlyComparison } from "@/lib/types";
+import type { YearlyComparison } from "@/types/housing";
 import { formatCurrency } from "@/lib/format";
 
 interface ComparisonChartProps {

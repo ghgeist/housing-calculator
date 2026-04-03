@@ -1,3 +1,5 @@
+export type PropertyCostBasis = "purchase" | "currentValue";
+
 export interface HousingInputs {
   homePrice: number;
   downPaymentPct: number;
@@ -6,6 +8,7 @@ export interface HousingInputs {
   propertyTaxRate: number;
   maintenanceRate: number;
   annualInsurance: number;
+  propertyCostBasis: PropertyCostBasis;
   monthlyRent: number;
   rentGrowthRate: number;
   appreciationRate: number;

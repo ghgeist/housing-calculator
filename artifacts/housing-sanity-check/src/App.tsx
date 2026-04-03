@@ -3,8 +3,8 @@ import { InputsPanel } from "@/components/InputsPanel";
 import { ResultsPanel } from "@/components/ResultsPanel";
 import { ComparisonChart } from "@/components/ComparisonChart";
 import { DEFAULT_INPUTS } from "@/lib/defaults";
-import { runModel } from "@/lib/model";
-import type { HousingInputs } from "@/lib/types";
+import { runModel } from "@/lib/housing/model";
+import type { HousingInputs } from "@/types/housing";
 import "./app.css";
 
 function App() {
