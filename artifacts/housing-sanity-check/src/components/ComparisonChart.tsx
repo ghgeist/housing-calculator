@@ -9,19 +9,22 @@ import {
   ResponsiveContainer,
   ReferenceLine,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 import type { YearlyComparison } from "@/types/housing";
 import { formatCurrency } from "@/lib/format";
+
+type TooltipPayloadEntry = NonNullable<TooltipProps<number, string>["payload"]>[number];
 
 interface ComparisonChartProps {
   data: YearlyComparison[];
 }
 
-function CustomTooltip({ active, payload, label }: any) {
+function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
   if (!active || !payload?.length) return null;
   return (
     <div className="chart-tooltip">
       <p className="chart-tooltip-title">Year {label}</p>
-      {payload.map((entry: any) => (
+      {payload.map((entry: TooltipPayloadEntry) => (
         <div key={entry.dataKey} className="chart-tooltip-row">
           <span className="chart-tooltip-color" style={{ background: entry.color }} />
           <span className="chart-tooltip-name">{entry.name}:</span>
@@ -58,7 +61,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
       <div className="chart-header">
         <h3 className="section-title">Owning vs renting + investing</h3>
         <p className="chart-subtitle">
-          Total net cost of each path over the years you entered. Lower is cheaper.
+          Cumulative net cost of each path over the years you entered. Lower is cheaper.
         </p>
       </div>
 
@@ -97,13 +100,15 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           <YAxis
             tick={{ fontSize: 11, fill: "var(--chart-axis)" }}
             tickLine={false}
-            tickFormatter={(v) => formatCurrency(v, true)}
+            tickFormatter={(v: number) => formatCurrency(v, true)}
             width={60}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
             wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
-            formatter={(value) => <span style={{ color: "var(--chart-axis)" }}>{value}</span>}
+            formatter={(value: string | number) => (
+              <span style={{ color: "var(--chart-axis)" }}>{value}</span>
+            )}
           />
           {breakEvenYear && (
             <ReferenceLine
@@ -116,7 +121,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           <Line
             type="monotone"
             dataKey="ownerNetCost"
-            name="Own — net cost"
+            name="Own: net cost"
             stroke="var(--chart-own)"
             strokeWidth={2.5}
             dot={false}
@@ -125,7 +130,7 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
           <Line
             type="monotone"
             dataKey="renterNetCost"
-            name="Rent + Invest — net cost"
+            name="Rent + invest: net cost"
             stroke="var(--chart-rent)"
             strokeWidth={2.5}
             dot={false}
@@ -136,7 +141,9 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
 
       <div className="chart-wealth-section">
         <h4 className="chart-wealth-title">Where the money ends up</h4>
-        <p className="chart-subtitle">Home equity vs what the renter’s investments grew to — paper wealth, not cash in hand.</p>
+        <p className="chart-subtitle">
+          Home equity versus what the renter&apos;s investments grew to. Paper wealth, not cash in hand.
+        </p>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
@@ -148,13 +155,15 @@ export function ComparisonChart({ data }: ComparisonChartProps) {
             <YAxis
               tick={{ fontSize: 11, fill: "var(--chart-axis)" }}
               tickLine={false}
-              tickFormatter={(v) => formatCurrency(v, true)}
+              tickFormatter={(v: number) => formatCurrency(v, true)}
               width={60}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend
               wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
-              formatter={(value) => <span style={{ color: "var(--chart-axis)" }}>{value}</span>}
+              formatter={(value: string | number) => (
+              <span style={{ color: "var(--chart-axis)" }}>{value}</span>
+            )}
             />
             <Line
               type="monotone"

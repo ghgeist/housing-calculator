@@ -83,6 +83,14 @@ Typical commands should be:
 
 If scripts are missing or unclear, add the minimum needed to make the repo easy to run.
 
+### `artifacts/housing-sanity-check` (own vs rent UI)
+
+The polished calculator UI may live under `artifacts/housing-sanity-check` (path and package name can vary).
+
+- **Number fields:** `InputsPanel` uses a **draft string + commit on blur** pattern with `src/lib/numberInputCommit.ts`. Do not revert to `parseFloat` on every `onChange`; it breaks typing and empty fields.
+- **Reset / dirty checks:** use `housingInputsEqual` from `src/lib/housingInputsEqual.ts` instead of hand-comparing each field of `HousingInputs` (avoids silent bugs when the type gains a property).
+- **Tests:** from that package, `pnpm test` runs `tsc` and Node tests; the script invokes `tsx` via `@workspace/scripts` with paths relative to the repo layout—if tests fail with “file not found,” check that layout before rewriting the test runner.
+
 ## Documentation expectations
 
 Keep README concise and useful.

@@ -1,5 +1,5 @@
 import React from "react";
-import test from "node:test";
+import { test } from "vitest";
 import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ResultsPanel } from "./ResultsPanel";

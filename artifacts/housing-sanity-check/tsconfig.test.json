@@ -3,6 +3,10 @@
   "include": [
     "src/lib/defaults.ts",
     "src/lib/format.ts",
+    "src/lib/numberInputCommit.ts",
+    "src/lib/numberInputCommit.test.ts",
+    "src/lib/housingInputsEqual.ts",
+    "src/lib/housingInputsEqual.test.ts",
     "src/lib/housing/model.ts",
     "src/lib/housing/model.test.ts",
     "src/components/ResultsPanel.tsx",

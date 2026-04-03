@@ -8,7 +8,7 @@
     "build": "vite build --config vite.config.ts",
     "serve": "vite preview --config vite.config.ts --host 0.0.0.0",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsc -p tsconfig.test.json --noEmit && pnpm --filter @workspace/scripts exec tsx --test $(pwd)/src/lib/housing/model.test.ts $(pwd)/src/components/ResultsPanel.smoke.test.tsx"
+    "test": "tsc -p tsconfig.test.json --noEmit && pnpm --filter @workspace/scripts exec tsx --test ../artifacts/housing-sanity-check/src/lib/numberInputCommit.test.ts ../artifacts/housing-sanity-check/src/lib/housingInputsEqual.test.ts ../artifacts/housing-sanity-check/src/lib/housing/model.test.ts ../artifacts/housing-sanity-check/src/components/ResultsPanel.smoke.test.tsx"
   },
   "devDependencies": {
     "@hookform/resolvers": "^3.10.0",

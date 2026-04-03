@@ -1,11 +1,28 @@
-import { useState, useMemo } from "react";
+import { lazy, Suspense, useState, useMemo } from "react";
 import { InputsPanel } from "@/components/InputsPanel";
 import { ResultsPanel } from "@/components/ResultsPanel";
-import { ComparisonChart } from "@/components/ComparisonChart";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_INPUTS } from "@/lib/defaults";
 import { runModel } from "@/lib/housing/model";
 import type { HousingInputs } from "@/types/housing";
 import "./app.css";
+
+const ComparisonChart = lazy(() =>
+  import("@/components/ComparisonChart").then((m) => ({ default: m.ComparisonChart })),
+);
+
+function ChartSectionFallback() {
+  return (
+    <div className="comparison-chart" aria-busy="true" aria-label="Loading chart">
+      <Skeleton className="mb-4 h-6 w-48" />
+      <Skeleton className="mb-6 h-4 w-full max-w-md" />
+      <Skeleton className="mb-6 h-[300px] w-full" />
+      <Skeleton className="mb-2 h-5 w-40" />
+      <Skeleton className="mb-4 h-4 w-full max-w-lg" />
+      <Skeleton className="h-[220px] w-full" />
+    </div>
+  );
+}
 
 function App() {
   const [inputs, setInputs] = useState<HousingInputs>(DEFAULT_INPUTS);
@@ -17,7 +34,8 @@ function App() {
         <div className="header-inner">
           <h1 className="app-title">Housing Sanity Check</h1>
           <p className="app-subtitle">
-            Plug in a few numbers and compare what owning really costs each month to renting something similar.
+            Plug in a few numbers and compare the monthly cash cost of owning with renting a comparable place. You type
+            the rent you think matches this home; it is your estimate, not a market scrape.
           </p>
         </div>
       </header>
@@ -30,34 +48,41 @@ function App() {
 
           <div className="layout-results">
             <ResultsPanel results={results} inputs={inputs} />
-            <ComparisonChart data={results.yearlyComparison} />
+            <Suspense fallback={<ChartSectionFallback />}>
+              <ComparisonChart data={results.yearlyComparison} />
+            </Suspense>
 
             <div className="framing-note">
               <h3 className="framing-title">What you&apos;re looking at</h3>
               <p>
-                I built so I could see the <strong>monthly reality</strong>: interest, taxes, upkeep, and insurance
-                — versus what you&apos;d pay to rent a comparable place. A home is something you live in and pay for; this
-                isn&apos;t a pitch that owning always beats the market.
+                <strong>Monthly reality</strong>: interest, taxes, upkeep, and insurance versus the monthly rent you
+                assign for a comparable place (your estimate from the form). A home is something you live in and pay
+                for; this is not a pitch that owning always beats the market.
               </p>
-              <p>
-                <strong>True monthly cost</strong> leaves out principal paydown because that turns cash into equity, not
-                day-to-day spending. The chart compares two straight stories: you own, or you rent and invest the
-                difference. Neither path is automatically right — the point is to make the tradeoff visible.
-              </p>
-              <ul>
-                <li>
-                  <strong>Positive Carry</strong> — the rent implied by this home is high enough that your
-                  mortgage-heavy costs don&apos;t feel like a huge drag. Owning is roughly efficient on cash flow.
-                </li>
-                <li>
-                  <strong>Near Neutral</strong> — roughly in balance. You pay a modest premium to own.
-                </li>
-                <li>
-                  <strong>Negative Carry</strong> — owning costs more than this implied rent each month. You&apos;re
-                  paying a real premium to own; that can still be worth it for stability or other reasons — here you can
-                  see how much.
-                </li>
-              </ul>
+              <details className="framing-methodology">
+                <summary className="framing-methodology-summary">
+                  More on carry, the chart, and true monthly cost
+                </summary>
+                <p>
+                  <strong>True monthly cost</strong> leaves out principal paydown because that turns cash into equity, not
+                  day-to-day spending. The chart compares two straight stories: you own, or you rent and invest the
+                  difference. Neither path is automatically right. The point is to make the tradeoff visible.
+                </p>
+                <ul>
+                  <li>
+                    <strong>Positive Carry</strong>: implied rent from your numbers is high enough that total financing
+                    and ownership drag stays modest (see the carry snapshot). Owning is roughly efficient on cash flow.
+                  </li>
+                  <li>
+                    <strong>Near Neutral</strong>: roughly in balance. You pay a modest premium to own.
+                  </li>
+                  <li>
+                    <strong>Negative Carry</strong>: owning costs more each month than that implied rent. You pay a real
+                    premium to own; that can still be worth it for stability or other reasons, and you can see how much
+                    in the results.
+                  </li>
+                </ul>
+              </details>
             </div>
           </div>
         </div>

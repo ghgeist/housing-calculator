@@ -48,14 +48,14 @@ function DetailRow({ label, value, muted }: { label: string; value: string; mute
 }
 
 export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
-  const { monthly, premiumVsRent, carry, loanAmount, ltv } = results;
+  const { monthly, premiumVsRent, carry, ltv } = results;
   const isOwningCheaper = premiumVsRent < 0;
   const premiumAbs = Math.abs(premiumVsRent);
 
   const carryExplanation: Record<string, string> = {
-    "Positive Carry": `At these numbers, the rent you’d expect for this home roughly covers your mortgage-heavy costs — owning isn’t much of a monthly drain.`,
-    "Near Neutral": `Roughly balanced. You pay a bit more to own than the rent implied here, but not wildly.`,
-    "Negative Carry": `Owning costs noticeably more than the rent implied here each month — you’re paying a real premium to own (which might still be worth it for other reasons).`,
+    "Positive Carry": `At these numbers, implied rent (from what you entered) roughly covers financing and ownership drag. Owning is not much of a monthly drain.`,
+    "Near Neutral": `Roughly balanced. You pay a bit more to own than implied rent here, but not wildly.`,
+    "Negative Carry": `Owning costs noticeably more each month than implied rent here. You are paying a real premium to own (which might still be worth it for other reasons).`,
   };
 
   return (
@@ -65,12 +65,18 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           {isOwningCheaper ? (
             <>
               <span className="hero-amount hero-positive">{formatCurrency(premiumAbs)}/mo</span>
-              <span className="hero-label">cheaper to own than rent</span>
+              <span className="hero-label">
+                cheaper to own than rent{" "}
+                <span className="hero-label-scope">(true monthly cost)</span>
+              </span>
             </>
           ) : (
             <>
               <span className="hero-amount hero-negative">{formatCurrency(premiumAbs)}/mo</span>
-              <span className="hero-label">more expensive to own than rent</span>
+              <span className="hero-label">
+                more expensive to own than rent{" "}
+                <span className="hero-label-scope">(true monthly cost)</span>
+              </span>
             </>
           )}
         </div>
@@ -92,7 +98,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
         <StatCard
           label="Comparable rent"
           value={formatCurrency(inputs.monthlyRent)}
-          sub="What you’d pay to rent instead"
+          sub="What you would pay to rent instead"
         />
         <StatCard
           label="Down Payment"
@@ -114,7 +120,7 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           <DetailRow label="Total P&I payment" value={formatCurrency(monthly.principalAndInterest)} muted />
         </div>
         <p className="detail-note">
-          Principal paydown isn’t included in true monthly cost — it builds equity in the home, not “spending” like interest
+          Principal paydown is not included in true monthly cost; it builds equity in the home, not spending like interest
           or repairs.
         </p>
       </div>
@@ -132,14 +138,14 @@ export function ResultsPanel({ results, inputs }: ResultsPanelProps) {
           />
           <div className="detail-divider" />
           <DetailRow
-            label="Net (yield − drag)"
+            label="Net (yield minus drag)"
             value={`${carry.delta >= 0 ? "+" : ""}${formatPercent(carry.delta * 100)}`}
           />
         </div>
         <p className="detail-note">
-          Rent yield is annual rent ÷ home price. Drag adds mortgage cost (by loan-to-value), taxes, maintenance, and
-          insurance. Positive net means the implied rent keeps up with those costs; negative means you’re carrying extra
-          cost to own.
+          <strong>Implied rent yield</strong> is annual rent ÷ home price. <strong>Drag</strong> adds mortgage cost (by
+          loan-to-value), taxes, maintenance, and insurance. Positive net means implied rent keeps up with those costs;
+          negative means you are carrying extra cost to own.
         </p>
       </div>
     </div>
